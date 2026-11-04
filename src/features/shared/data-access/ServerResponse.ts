@@ -13,16 +13,7 @@ export interface ServerResponse<ResponseData> {
  * We cannot return plain Zod Error classes as they're not serializable.
  */
 export const extractZodErrors = (error: ZodError) => {
-  const formattedErrors = error.format();
-  const errors: Array<ServerError> = [];
-
-  for (const [key, value] of Object.entries(formattedErrors)) {
-    if (key === '_errors') continue;
-    // @ts-expect-error
-    if (!value || typeof value !== 'object' || !Array.isArray(value._errors)) continue;
-    // @ts-expect-error
-    value._errors.forEach((errorMsg) => errors.push({ message: errorMsg }));
-  }
+  const errors: Array<ServerError> = error.issues.map(({ message }) => ({ message }));
 
   if (errors.length < 1) errors.push({ message: 'Unknown Zod error.' });
   return errors;

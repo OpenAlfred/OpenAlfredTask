@@ -2,12 +2,9 @@
 
 import { revalidateTag } from 'next/cache';
 import { z } from 'zod';
-import { endOfDay, startOfDay } from 'date-fns';
-import { zonedTimeToUtc } from 'date-fns-tz';
-import { cuid2 } from '@/features/shared/data-access/cuid2';
-import { prisma } from '@/features/shared/data-access/prisma';
 import { getServerSideUser } from '@/features/app/users/data-access/UsersDataAccess';
 import { createTaskSchema, deleteTaskSchema, updateTaskSchema } from '../domain/TasksDomain';
+import * as tasksService from '../service/TasksService';
 import {
   ServerResponse,
   createServerErrorResponse,
@@ -60,18 +57,9 @@ export const createTask = async (
   }
 
   try {
-    const { dueDate, projectId, ...data } = validation.data;
     const { id: authorId } = await getServerSideUser();
 
-    const result = await prisma.task.create({
-      data: {
-        author: { connect: { id: authorId } },
-        project: { connect: { id: projectId } },
-        ...data,
-        ...(dueDate && { dueDate: dueDate.toISOString() }),
-        id: cuid2(),
-      },
-    });
+    const result = await tasksService.createTask(authorId, validation.data);
 
     /*
      * Check <TaskFormFields> to see why we need revalidateTagValue.
@@ -108,9 +96,7 @@ export const deleteTask = async (
     const { id } = validation.data;
     const { id: authorId } = await getServerSideUser();
 
-    const result = await prisma.task.delete({
-      where: { id, authorId },
-    });
+    const result = await tasksService.deleteTask(authorId, id);
 
     return createServerSuccessResponse(result);
   } catch (error) {
@@ -145,49 +131,13 @@ export const getTasks = async ({
   try {
     const { id: authorId, timeZone } = await getServerSideUser();
 
-    /*
-     * Sensible default: order completed tasks by completedAt desc.
-     */
-    let _orderBy = orderBy;
-    if (!_orderBy && only === 'completed') _orderBy = 'completedAtDesc';
-    /**/
-
-    let orderByQuery: { completedAt: 'asc' | 'desc' } | { createdAt: 'asc' | 'desc' };
-    switch (_orderBy) {
-      case 'completedAtAsc':
-        orderByQuery = { completedAt: 'asc' };
-        break;
-      case 'completedAtDesc':
-        orderByQuery = { completedAt: 'desc' };
-        break;
-      case 'createdAtAsc':
-        orderByQuery = { createdAt: 'asc' };
-        break;
-      case 'createdAtDesc':
-        orderByQuery = { createdAt: 'desc' };
-        break;
-      default:
-        orderByQuery = { createdAt: 'asc' };
-        break;
-    }
-
-    const result = await prisma.task.findMany({
-      where: {
-        authorId,
-        ...(dueBy && { dueDate: { lte: zonedTimeToUtc(endOfDay(dueBy), timeZone) } }),
-        ...(dueOn && {
-          dueDate: {
-            gte: zonedTimeToUtc(startOfDay(dueOn), timeZone),
-            lte: zonedTimeToUtc(endOfDay(dueOn), timeZone),
-          },
-        }),
-        ...(only && { completedAt: only === 'completed' ? { not: null } : null }),
-        ...(byProject && { projectId: byProject }),
-        ...(onlyProject && {
-          project: { archivedAt: onlyProject === 'archived' ? { not: null } : null },
-        }),
-      },
-      orderBy: orderByQuery,
+    const result = await tasksService.listTasks(authorId, timeZone, {
+      byProject,
+      dueBy,
+      dueOn,
+      only,
+      onlyProject,
+      orderBy,
     });
 
     return createServerSuccessResponse(result);
@@ -203,12 +153,7 @@ export const getTaskById = async (id: string) => {
   try {
     const { id: authorId } = await getServerSideUser();
 
-    const result = await prisma.task.findUnique({
-      where: { authorId, id },
-      include: {
-        project: true,
-      },
-    });
+    const result = await tasksService.findTask(authorId, id);
 
     return createServerSuccessResponse(result);
   } catch (error) {
@@ -233,20 +178,14 @@ export const updateTask = async (
   }
 
   try {
-    const { id, dueDate, ...data } = validation.data;
+    const { id, ...data } = validation.data;
     const { id: authorId } = await getServerSideUser();
 
-    const result = await prisma.task.update({
-      where: { id, authorId },
-      data: {
-        ...data,
-        /*
-         * We pass dueDate as null when the user clears the datepicker to remove a due date.
-         */
-        ...(dueDate !== undefined && { dueDate: dueDate ? dueDate.toISOString() : dueDate }),
-        /**/
-      },
-    });
+    /*
+     * dueDate is null when the user clears the datepicker to remove a due date.
+     */
+    const result = await tasksService.updateTask(authorId, id, data);
+    /**/
 
     /*
      * Unfortunately we can't use revalidatePath() and revalidateTag(), they break the app

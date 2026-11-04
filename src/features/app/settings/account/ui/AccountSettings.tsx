@@ -4,10 +4,14 @@ import { buttonRedClassName } from '@/features/shared/ui/control/button/buttonCl
 import { AlertDialog, AlertDialogBody } from '@/features/shared/ui/dialog/AlertDialog';
 import { Form } from '@/features/shared/ui/form/Form';
 import { FormErrorList } from '@/features/shared/ui/form/FormErrorList';
+import { ErrorList } from '@/features/shared/ui/error/ErrorList';
+import { getApiTokens } from '@/features/app/api-tokens/data-access/ApiTokensDataAccess';
+import { ApiTokensSection } from '@/features/app/api-tokens/ui/ApiTokensSection';
 import { deleteUserAccount, getUser } from '@/features/app/users/data-access/UsersDataAccess';
 
 export const AccountSettings = async () => {
   const user = await getUser();
+  const { data: tokens, errors: tokensErrors } = await getApiTokens();
 
   const deleteButton = (
     <button type="button" className={twMerge(buttonRedClassName, 'mt-4 self-start')}>
@@ -26,6 +30,11 @@ export const AccountSettings = async () => {
           <dd className="truncate">{user.email}</dd>
         </dl>
       </section>
+      {tokensErrors ? (
+        <ErrorList errors={tokensErrors} />
+      ) : (
+        <ApiTokensSection initialTokens={tokens ?? []} />
+      )}
       <section className="flex flex-col rounded-xl border border-destructive/30 p-5">
         <h2 className="text-sm font-semibold text-destructive">Delete account</h2>
         <p className="mt-1 text-sm text-muted-foreground">

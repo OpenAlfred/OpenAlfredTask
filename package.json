@@ -18,6 +18,7 @@
   "dependencies": {
     "@ducanh2912/next-pwa": "9.7.2",
     "@headlessui/react": "1.7.18",
+    "@modelcontextprotocol/server": "2.4.0",
     "@paralleldrive/cuid2": "2.2.2",
     "@prisma/client": "5.8.1",
     "@radix-ui/react-alert-dialog": "1.0.5",
@@ -28,6 +29,7 @@
     "date-fns": "2.30.0",
     "date-fns-tz": "2.0.0",
     "isomorphic-dompurify": "2.2.0",
+    "mcp-handler": "2.3.0",
     "next": "14.2.35",
     "react": "18.2.0",
     "react-contenteditable": "3.3.7",
@@ -38,7 +40,7 @@
     "tailwind-merge": "2.2.0",
     "ua-parser-js": "1.0.37",
     "usehooks-ts": "2.9.5",
-    "zod": "3.22.4"
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@mdx-js/loader": "3.0.0",

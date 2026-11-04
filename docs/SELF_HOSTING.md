@@ -203,6 +203,79 @@ WantedBy=timers.target
 
 Aktivieren mit `sudo systemctl enable --now opentask-backup.timer`.
 
+## 7. MCP-Server nutzen
+
+OpenTask hat einen MCP-Server unter `/api/mcp`. Damit kann ein KI-Assistent wie Claude Code deine
+Projekte und Tasks lesen und ändern.
+
+### Token anlegen
+
+Öffne in OpenTask die **Einstellungen** und lege unter „API tokens“ einen Token an. Gib ihm einen Namen,
+zum Beispiel „Claude Code auf dem Laptop“, und wähle, wann er abläuft (voreingestellt: 1 Jahr). Der
+Token steht nur direkt nach dem Anlegen im Klartext da, in der Datenbank liegt nur sein Hash. Er gibt
+dieselben Rechte wie dein Account. In derselben Liste kannst du ihn jederzeit widerrufen, danach
+schlägt er sofort fehl.
+
+### Claude Code verbinden
+
+Die Einstellungen zeigen den fertigen Befehl direkt nach dem Anlegen. Er sieht so aus:
+
+```bash
+claude mcp add --transport http opentask https://tasks.example.com/api/mcp --header "Authorization: Bearer <token>"
+```
+
+Ob die Verbindung steht, siehst du in Claude Code mit `/mcp`. Soll der Token nicht in einer Datei
+landen, die du ins Repository eincheckst, nimm in der `.mcp.json` eine Umgebungsvariable:
+
+```json
+{
+  "mcpServers": {
+    "opentask": {
+      "type": "http",
+      "url": "https://tasks.example.com/api/mcp",
+      "headers": { "Authorization": "Bearer ${OPENTASK_TOKEN}" }
+    }
+  }
+}
+```
+
+Claude Code läuft auf deinem Rechner und verbindet sich von dort, es geht also, solange WireGuard
+läuft. claude.ai und die Apps auf dem Handy verbinden sich laut Anthropic aus der Cloud. Ein Server,
+der nur über ein VPN erreichbar ist, geht damit nicht.
+
+Zwei Dinge sind **nicht getestet**:
+
+- Bei Variante A (`tls internal`) kennt Claude Code Caddys Zertifizierungsstelle nicht. Starte es dann
+  mit `NODE_EXTRA_CA_CERTS=/pfad/zu/caddy-root.crt claude`.
+- Für Clients ohne HTTP-Unterstützung gibt es die stdio-Brücke `mcp-remote`:
+  `npx -y mcp-remote https://tasks.example.com/api/mcp --header "Authorization: Bearer ${OPENTASK_TOKEN}"`.
+
+### Was der Server kann
+
+| Tool | Wofür |
+|---|---|
+| `list_projects` | Projekte mit ihren IDs, aktive oder archivierte |
+| `create_project`, `update_project` | Projekt anlegen, umbenennen, archivieren und wiederherstellen |
+| `list_tasks` | Offene, erledigte oder alle Tasks, nach Projekt, Tag (`due_on`) oder bis zu einem Tag (`due_by`) gefiltert |
+| `get_task` | Ein Task mit allen Feldern |
+| `create_task`, `update_task` | Task anlegen, ändern, in ein anderes Projekt verschieben, Fälligkeit setzen oder entfernen |
+| `complete_task` | Task erledigen oder wieder öffnen |
+| `delete_task` | Task endgültig löschen |
+
+Termine sind Kalendertage im Format `YYYY-MM-DD` in der Zeitzone deines Accounts. Die Zeitzone setzt
+die App, sobald du sie im Browser öffnest, bis dahin gilt UTC. Projekte lassen sich bewusst nicht
+löschen, nur archivieren, weil dabei alle ihre Tasks verschwinden würden. Auch `delete_task` ist
+endgültig. Für erledigte Tasks ist `complete_task` die bessere Wahl.
+
+### Wie er abgesichert ist
+
+- Jede Anfrage braucht einen gültigen Token im Header `Authorization: Bearer`, sonst antwortet der
+  Server mit 401.
+- Anfragen mit einem fremden `Origin`-Header beantwortet er mit 403. Browser senden immer einen,
+  MCP-Clients keinen. Erlaubt sind die Adressen aus `BETTER_AUTH_URL` und
+  `BETTER_AUTH_TRUSTED_ORIGINS`.
+- Ein Token sieht und ändert nur die Projekte und Tasks seines Besitzers.
+
 ## Fehlersuche
 
 | Problem | Was du prüfst |
@@ -213,4 +286,7 @@ Aktivieren mit `sudo systemctl enable --now opentask-backup.timer`.
 | Nach dem Login landest du wieder auf der Login-Seite | Du rufst die App über HTTP auf, aber `BETTER_AUTH_URL` beginnt mit `https://`. Dann setzt Better Auth Secure-Cookies, die der Browser über HTTP nicht zurückschickt. |
 | `docker compose` bricht mit „Set POSTGRES_PASSWORD in .env“ ab | Die Variable fehlt in `.env`. |
 | Port schon belegt | `APP_PORT`, `DB_PORT`, `CADDY_HTTP_PORT` oder `CADDY_HTTPS_PORT` in `.env` ändern. |
+| MCP antwortet mit 401 | Der Token ist falsch, widerrufen oder abgelaufen. Lege in den Einstellungen einen neuen an. |
+| MCP antwortet mit 403 | Die Anfrage hat einen `Origin`-Header, der nicht zu `BETTER_AUTH_URL` oder `BETTER_AUTH_TRUSTED_ORIGINS` passt. MCP-Clients senden keinen, Browser immer. |
+| Claude Code meldet bei HTTPS einen Zertifikatsfehler | Bei Variante A: `NODE_EXTRA_CA_CERTS` auf Caddys Root-Zertifikat setzen (Abschnitt 7). |
 | App erreichbar, obwohl sie es nicht sein soll | `ss -ltn` zeigt, an welche Adresse ein Port gebunden ist (siehe Abschnitt 3). |

@@ -54,11 +54,33 @@ Everything is read from `.env` (see `.env.example`):
 | `APP_BIND`, `APP_PORT` | Host address and port of the app. |
 | `CADDY_BIND`, `CADDY_HTTP_PORT`, `CADDY_HTTPS_PORT`, `APP_DOMAIN` | Only for `docker compose --profile https`. |
 
+## MCP server
+
+OpenTask has a [Model Context Protocol](https://modelcontextprotocol.io) server at `/api/mcp`, so an
+AI assistant such as Claude Code can read and change your projects and tasks.
+
+1. Sign in, open **Settings** and create an API token under "API tokens". It's shown only once.
+2. Add the server to your client. For Claude Code:
+
+   ```bash
+   claude mcp add --transport http opentask https://<your-host>/api/mcp --header "Authorization: Bearer <token>"
+   ```
+
+The tools are `list_projects`, `create_project`, `update_project`, `list_tasks`, `get_task`,
+`create_task`, `update_task`, `complete_task` and `delete_task`. Dates are calendar days
+(`YYYY-MM-DD`) in the time zone of your account. Projects can be archived but not deleted. A token has
+the same access as your account, so keep it secret and revoke it in Settings when you no longer need it.
+
+The endpoint is stateless Streamable HTTP and serves the 2025 and 2026 revisions of the protocol.
+Clients that connect from the cloud, such as claude.ai, can't reach a server that is only available
+over a VPN. See [docs/SELF_HOSTING.md](docs/SELF_HOSTING.md) for the details.
+
 ## Differences from upstream
 
 - Better Auth with email and password replaces Supabase Auth. There is no OAuth or magic link.
 - Prisma talks to a plain PostgreSQL. The `User`, `Session`, `Account` and `Verification` tables belong
   to Better Auth.
+- An MCP server with personal API tokens, see above.
 - No Google Analytics, and the marketing landing page redirects to the app.
 - The `privacy` and `terms` pages still describe the upstream hosted service. Don't rely on them.
 

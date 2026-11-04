@@ -3,8 +3,6 @@
 import 'server-only';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
-import { cuid2 } from '@/features/shared/data-access/cuid2';
-import { prisma } from '@/features/shared/data-access/prisma';
 import {
   ServerResponse,
   createServerErrorResponse,
@@ -17,6 +15,7 @@ import {
   deleteProjectSchema,
   updateProjectSchema,
 } from '../domain/ProjectsDomain';
+import * as projectsService from '../service/ProjectsService';
 
 export type CreateProjectDto = z.infer<typeof createProjectSchema>;
 
@@ -40,20 +39,9 @@ export const createProject = async (
   let result;
 
   try {
-    const { data } = validation;
     const { id } = await getServerSideUser();
 
-    result = await prisma.project.create({
-      data: {
-        author: {
-          connect: {
-            id,
-          },
-        },
-        ...data,
-        id: cuid2(),
-      },
-    });
+    result = await projectsService.createProject(id, validation.data);
   } catch (error) {
     console.error(error);
 
@@ -81,9 +69,7 @@ export const deleteProject = async (
     const { id } = validation.data;
     const { id: authorId } = await getServerSideUser();
 
-    await prisma.project.delete({
-      where: { id, authorId },
-    });
+    await projectsService.deleteProject(authorId, id);
   } catch (error) {
     console.error(error);
 
@@ -98,10 +84,7 @@ export const getProjects = async ({ isArchived }: { isArchived?: boolean } = {})
   try {
     const { id: authorId } = await getServerSideUser();
 
-    const result = await prisma.project.findMany({
-      where: { authorId, archivedAt: isArchived ? { not: null } : null },
-      orderBy: isArchived ? { archivedAt: 'desc' } : { createdAt: 'asc' },
-    });
+    const result = await projectsService.listProjects(authorId, { isArchived });
     return createServerSuccessResponse(result);
   } catch (error) {
     console.error(error);
@@ -115,9 +98,7 @@ export const getProjectById = async (id: string) => {
   try {
     const { id: authorId } = await getServerSideUser();
 
-    const result = await prisma.project.findUnique({
-      where: { authorId, id },
-    });
+    const result = await projectsService.findProject(authorId, id);
 
     return createServerSuccessResponse(result);
   } catch (error) {
@@ -147,10 +128,7 @@ export const updateProject = async (
     const { id, ...data } = validation.data;
     const { id: authorId } = await getServerSideUser();
 
-    result = await prisma.project.update({
-      where: { id, authorId },
-      data,
-    });
+    result = await projectsService.updateProject(authorId, id, data);
   } catch (error) {
     console.error(error);
 
