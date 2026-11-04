@@ -8,6 +8,9 @@
 #   gunzip -c backups/opentask-<date>.sql.gz | docker compose exec -T db sh -c 'psql -U "$POSTGRES_USER" "$POSTGRES_DB"'
 set -euo pipefail
 
+# The dump holds password hashes and sessions, so the folder and the files stay private.
+umask 077
+
 cd "$(dirname "$0")/.."
 
 backup_dir="${BACKUP_DIR:-backups}"
@@ -17,8 +20,12 @@ file="$backup_dir/opentask-$(date +%Y-%m-%d_%H%M%S).sql.gz"
 mkdir -p "$backup_dir"
 
 # Write to a temporary name first, so a failed dump never leaves a truncated backup behind.
+# </dev/null keeps docker from reading the input of whatever called this script. Run from
+# `ssh host bash -s`, it would swallow the rest of the script.
+trap 'rm -f "$file.tmp"' EXIT
 docker compose exec -T db sh -c 'pg_dump --clean --if-exists -U "$POSTGRES_USER" "$POSTGRES_DB"' \
-  | gzip > "$file.tmp"
+  </dev/null | gzip > "$file.tmp"
+gzip -t "$file.tmp"
 mv "$file.tmp" "$file"
 
 ls -1t "$backup_dir"/opentask-*.sql.gz | tail -n +"$((keep + 1))" | xargs -r rm --

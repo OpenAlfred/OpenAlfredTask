@@ -219,8 +219,18 @@ Docker nichts neu.
 ```
 
 Das Skript schreibt `backups/opentask-<Datum>.sql.gz` und behält die letzten 14 Dateien
-(`KEEP=30 ./scripts/backup.sh` ändert das, `BACKUP_DIR=/pfad` das Ziel). Kopiere die Dateien zusätzlich
-auf einen anderen Rechner. Ein Backup auf demselben Server schützt nicht vor einem Plattenausfall.
+(`KEEP=30 ./scripts/backup.sh` ändert das, `BACKUP_DIR=/pfad` das Ziel). Die Dateien kann nur dein
+Benutzer lesen, denn sie enthalten Passwort-Hashes und Sitzungen.
+
+Ein Backup auf demselben Server schützt nicht vor einem Plattenausfall. Hol dir die Dateien deshalb
+zusätzlich auf einen anderen Rechner, zum Beispiel von deinem Laptop aus:
+
+```bash
+rsync -az alexander@10.8.0.1:opentask/backups/ ~/Backups/opentask/
+```
+
+Ohne `--delete` bleiben die älteren Kopien auf dem Laptop liegen, auch wenn der Server sie schon
+weggeräumt hat.
 
 Zurückspielen in einen laufenden Stack:
 
@@ -228,8 +238,22 @@ Zurückspielen in einen laufenden Stack:
 gunzip -c backups/opentask-<Datum>.sql.gz | docker compose exec -T db sh -c 'psql -U "$POSTGRES_USER" "$POSTGRES_DB"'
 ```
 
-Für ein nächtliches Backup kannst du einen systemd-Timer nutzen. **Das Beispiel ist nicht getestet.**
-Pfade und Benutzer passt du an.
+### Nächtlich per Cron
+
+Das geht ohne `sudo`. Trag mit `crontab -e` auf dem Server diese Zeile ein und passe den Pfad zum
+Projektordner an:
+
+```
+30 3 * * * cd "$HOME/opentask" && mkdir -p -m 700 backups && ./scripts/backup.sh >> backups/backup.log 2>&1
+```
+
+Cron startet das Skript dann jede Nacht um 3:30 Uhr. Fehler landen in `backups/backup.log`. Schau
+gelegentlich hinein, denn Cron meldet sich sonst nicht von selbst.
+
+### Alternativ: systemd-Timer
+
+Mit `sudo` geht es auch als systemd-Timer. **Dieses Beispiel ist nicht getestet.** Pfade und Benutzer
+passt du an.
 
 `/etc/systemd/system/opentask-backup.service`:
 
