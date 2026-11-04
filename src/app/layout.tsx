@@ -1,7 +1,6 @@
 import './globals.css';
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
-import { GoogleAnalytics } from '@next/third-parties/google';
 import { InstallPwaProvider } from '@/features/shared/ui/pwa/InstallPwaProvider';
 
 export const viewport: Viewport = {
@@ -13,16 +12,14 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://www.opentask.app'),
   title: 'OpenTask',
   description: 'Free and Open Source Task Manager.',
   applicationName: 'OpenTask',
-  manifest: 'https://www.opentask.app/manifest.json',
+  manifest: '/manifest.json',
   authors: [{ name: 'Flavio Silva', url: 'https://www.flsilva.com' }],
   creator: 'Flavio Silva',
   publisher: 'https://www.flsilva.com',
   formatDetection: { telephone: false },
-  alternates: { canonical: 'https://www.opentask.app' },
   generator: 'Next.js',
   keywords: [
     'open',
@@ -34,25 +31,8 @@ export const metadata: Metadata = {
     'next',
     'app-router',
     'tailwindcss',
-    'supabase',
     'prisma',
   ],
-  openGraph: {
-    type: 'website',
-    title: 'OpenTask',
-    description: 'Free and Open Source Task Manager.',
-    siteName: 'OpenTask',
-    url: 'https://www.opentask.app',
-    images: [{ url: 'https://www.opentask.app/tweet-card.png' }],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    site: 'https://www.opentask.app',
-    title: 'OpenTask',
-    description: 'Free and Open Source Task Manager.',
-    images: [{ url: 'https://www.opentask.app/tweet-card.png' }],
-    creator: '@flsilva7',
-  },
   icons: {
     shortcut: '/favicon.ico',
     apple: [{ rel: 'apple-touch-icon', sizes: '180x180', url: '/pwa-images/apple-icon-180.png' }],
@@ -148,7 +128,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className="h-full antialiased">
       <body className={`${inter.className} flex flex-col h-full`}>
         <InstallPwaProvider>{children}</InstallPwaProvider>
-        <GoogleAnalytics gaId="G-C6TYTB01NE" />
       </body>
     </html>
   );

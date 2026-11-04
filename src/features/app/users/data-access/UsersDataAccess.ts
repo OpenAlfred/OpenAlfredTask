@@ -1,11 +1,9 @@
 'use server';
 
-import { cookies } from 'next/headers';
-import {
-  createServerActionClient,
-  createServerComponentClient,
-} from '@supabase/auth-helpers-nextjs';
-import { Database } from '@/lib/database.types';
+import { cache } from 'react';
+import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
+import { getAuth } from '@/features/auth/auth';
 import { prisma } from '@/features/shared/data-access/prisma';
 import {
   ServerResponse,
@@ -43,43 +41,40 @@ export const deleteUserAccount = async (
   }
 
   try {
+    // Sessions and accounts are deleted along with the user (onDelete: Cascade).
     await prisma.user.delete({ where: { id } });
-    const supabase = createServerActionClient<Database>({ cookies });
-    await supabase.auth.signOut();
-    return createServerSuccessResponse(undefined);
   } catch (error) {
     console.error(error);
 
     // return a friendly error message instead of the (unknown) real one.
     return createServerErrorResponse<undefined>(genericAwareOfInternalErrorMessage);
   }
+
+  await signOut();
 };
 
-const getUserSession = async () => {
-  const supabase = createServerComponentClient<Database>({ cookies });
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+/*
+ * Every data access function asks for the user, so cache() looks the session up once per request.
+ */
+const getUserSession = cache(async () => {
+  const session = await getAuth().api.getSession({ headers: headers() });
 
-  if (!session || !session.user || typeof session.user.id !== 'string' || session.user.id === '') {
-    throw new Error('Your session has expired. Please sign in again.');
-  }
+  if (!session) throw new Error('Your session has expired. Please sign in again.');
 
   return session;
-};
+});
 
 /*
  * We don't expose user's id to the client because it doesn't need it.
  */
 export const getUser = async () => {
   const {
-    user: { user_metadata, email },
+    user: { email, name },
   } = await getUserSession();
-  const name = user_metadata && typeof user_metadata.name === 'string' ? user_metadata.name : email;
 
   const userDto: UserDto = {
-    email: email || '',
-    name: name || '',
+    email,
+    name: name || email,
   };
 
   return userDto;
@@ -91,17 +86,14 @@ export const getUser = async () => {
  */
 export const getServerSideUser = async () => {
   const {
-    user: { email, id, user_metadata },
+    user: { email, id, name, timeZone },
   } = await getUserSession();
-  const _user = await prisma.user.findUnique({ where: { id } });
-  const timeZone = _user && _user.timeZone ? _user.timeZone : '';
-  const name = user_metadata && typeof user_metadata.name === 'string' ? user_metadata.name : email;
 
   const userDto: ServerSideUserDto = {
-    email: email || '',
-    id: id || '',
-    name: name || '',
-    timeZone,
+    email,
+    id,
+    name: name || email,
+    timeZone: timeZone ?? '',
   };
 
   return userDto;
@@ -121,11 +113,12 @@ export const isUserAuthenticated = async () => {
 
 export const signOut = async () => {
   try {
-    const supabase = createServerActionClient<Database>({ cookies });
-    await supabase.auth.signOut();
+    await getAuth().api.signOut({ headers: headers() });
   } catch (error) {
     console.error(error);
   }
+
+  redirect('/auth/sign-in');
 };
 
 export const updateTimeZone = async (timeZone: string) => {

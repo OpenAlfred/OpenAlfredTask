@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { Logo } from '@/features/shared/ui/logo/Logo';
 import { Footer } from '@/features/marketing/shared/ui/Footer';
 
+export const dynamic = 'force-dynamic';
+
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <>

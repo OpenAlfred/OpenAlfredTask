@@ -1,68 +1,67 @@
-# Welcome to OpenTask
+# OpenTask
 
-To report bugs, please [open an issue](https://github.com/flsilva/opentask/issues).
+A small task manager with projects, tasks, due dates and a "Today" view. It is built with Next.js,
+Prisma and PostgreSQL. Sign-in is email and password, handled by
+[Better Auth](https://www.better-auth.com).
 
-To share ideas with the community, ask questions, and new features, please [start a discussion](https://github.com/flsilva/opentask/discussions).
+This is a self-hosted fork of [flsilva/opentask](https://github.com/flsilva/opentask) (MIT license).
+The original runs on Supabase. This fork only needs PostgreSQL, so the whole thing fits into one
+`docker compose` file.
 
-## How to run OpenTask locally
+## Quick start with Docker
 
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+```bash
+cp .env.example .env
+# Fill in POSTGRES_PASSWORD (openssl rand -hex 24) and BETTER_AUTH_SECRET (openssl rand -base64 32).
+docker compose up -d --build
+```
 
-It uses [Supabase](https://supabase.com/) as the backend service, which is built on top of Postgres.
+Open <http://localhost:3000>, create an account, then set `DISABLE_SIGNUP=true` in `.env` and run
+`docker compose up -d` again to close registration.
 
-You need Node.js v20.3.1+ to run OpenTask locally.
+Running it on a server behind WireGuard, HTTPS, backups and updates are covered in
+[docs/SELF_HOSTING.md](docs/SELF_HOSTING.md) (in German).
 
-### How to set up your local machine
+## Develop locally
 
-These instructions should be followed only once:
+You need Node.js 22.19.0 (see `.nvmrc`) and Docker for the database.
 
-1. Clone this repo.
-2. Install dependencies: `npm install`.
-3. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/).
-4. Make a copy of `.env.example` file and name it `.env`.
-   You won't need to change this file as it already contains the localhost database URL.
-   You can change it if you want to set up authentication with OAuth.
-5. Make a copy of `.env.local.example` file and name it `.env.local`.
-   You'll make a change to this file after you start Supabase (see next).
+```bash
+nvm use
+npm install
+cp .env.example .env     # fill in POSTGRES_PASSWORD and BETTER_AUTH_SECRET,
+                         # and use the same password in DATABASE_URL
+docker compose up -d db  # PostgreSQL on 127.0.0.1:5432
+npx prisma migrate deploy
+npm run dev
+```
 
-## How to run the app locally
+Open <http://localhost:3000>. `npm run build` needs no environment variables.
 
-These instructions should be followed every time you want to run the app locally:
+## Configuration
 
-1. Open Docker Desktop.
-2. [Start Supabase](https://supabase.com/docs/reference/cli/supabase-start): `npx supabase start -x realtime,storage-api,imgproxy`. That will exclude unused Supabase services to save on RAM. If you forget to open Docker Desktop you'll get an error message starting with `Cannot connect to the Docker daemon`.
-3. You'll get some URLs and `anon key`. Copy the value of `anon key` and past it in your `.env.local` file as the value of the `NEXT_PUBLIC_SUPABASE_ANON_KEY` variable. You only have to do this once.
-4. Run [Prisma migrations](https://www.prisma.io/docs/reference/api-reference/command-reference#migrate-dev): `npx prisma migrate dev`.
-5. Run Next.js local development server: `npm run dev`.
-6. Open [http://localhost:3000](http://localhost:3000) with your browser to use the app.
+Everything is read from `.env` (see `.env.example`):
 
-## How to sign in locally
+| Variable | Purpose |
+|---|---|
+| `DATABASE_URL` | PostgreSQL connection string for `npm run dev` and the Prisma CLI. Docker Compose builds its own for the containers. |
+| `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` | Credentials of the database container. |
+| `DB_PORT` | Host port of the database, bound to `127.0.0.1` only. |
+| `BETTER_AUTH_URL` | The URL you open the app with, including scheme and port. |
+| `BETTER_AUTH_SECRET` | Signs sessions. At least 32 characters. |
+| `BETTER_AUTH_TRUSTED_ORIGINS` | More origins that may use the app, comma-separated. Optional. |
+| `DISABLE_SIGNUP` | `true` closes registration. |
+| `APP_BIND`, `APP_PORT` | Host address and port of the app. |
+| `CADDY_BIND`, `CADDY_HTTP_PORT`, `CADDY_HTTPS_PORT`, `APP_DOMAIN` | Only for `docker compose --profile https`. |
 
-It's easier to sign in with an email on localhost, as there's no need to set up OAuth apps.
+## Differences from upstream
 
-Email sign in is enabled on localhost only, there's no such option on production.
+- Better Auth with email and password replaces Supabase Auth. There is no OAuth or magic link.
+- Prisma talks to a plain PostgreSQL. The `User`, `Session`, `Account` and `Verification` tables belong
+  to Better Auth.
+- No Google Analytics, and the marketing landing page redirects to the app.
+- The `privacy` and `terms` pages still describe the upstream hosted service. Don't rely on them.
 
-You can use a fake email like `test@test.com`. See how next.
+## License
 
-1. Visit the Sign In page, enter an email and hit continue. You should be redirected to `http://localhost:3000/auth/sign-in/check-email-link`.
-2. Open [http://localhost:54324/monitor](http://localhost:54324/monitor) in a new browser tab. That's [Inbucket](https://inbucket.org/), an email testing app running locally alongside Supabase.
-3. You should see an email with the subject `Confirm Your Email`. Open it, then click on the link `Confirm your email address`.
-4. You should be redirected to a URL that starts with `http://localhost/auth/v1/verify`. It used to work correctly, but after some tests it stopped adding the necessary port number to the URL. So go ahead and manually add `:54321` to the URL so that it starts with `http://localhost:54321/auth/v1/verify` instead (keep the rest of URL as is). We should fix this issue, but for now this extra step will make it.
-5. Hit enter and you should be logged in and redirected to `http://localhost:3000/app/today`.
-6. You can now test the app locally. Enjoy!
-
-That email confirmation link expires pretty quickly, so if you take a while to click it you might be redirected back to the Sign In page with the following URL:
-
-`http://localhost:3000/auth/sign-in#error=invalid_request&error_code=400&error_description=No+associated+flow+state+found.+400%253A+Flow+state+is+expired`.
-
-If that happens, just try again. If you can't sign in, please [open a issue](https://github.com/flsilva/opentask/issues).
-
-We should also improve the UX by adding a message telling the user that an error happened and they should try again.
-
-## How to stop running the app locally
-
-1. Stop Supabase: `npx supabase stop`. If you want to clear all database data, run this instead: `npx supabase stop --no-backup`.
-2. Close Docker Desktop.
-3. Stop the Next.js development server.
-
-If you find any problems with the instructions above, please [open an issue](https://github.com/flsilva/opentask/issues).
+MIT, see [LICENSE](LICENSE). Copyright (c) Flavio Silva.

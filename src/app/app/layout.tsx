@@ -5,6 +5,12 @@ import { InstallPwaDialog } from '@/features/shared/ui/pwa/InstallPwaDialog';
 import { UpdateUserTimeZone } from '@/features/app/users/ui/UpdateUserTimeZone';
 import { isUserAuthenticated } from '@/features/app/users/data-access/UsersDataAccess';
 
+/*
+ * Everything under /app depends on the session cookie. Without this, a build that can't read the
+ * session would prerender these pages with a redirect to the sign-in page baked in.
+ */
+export const dynamic = 'force-dynamic';
+
 export default async function AppLayout({
   children,
   dialog,

@@ -1,0 +1,18 @@
+node_modules
+.next
+.git
+.github
+.vscode
+.env
+.env.*
+!.env.example
+backups
+docs
+README.md
+npm-debug.log*
+
+# Files the PWA plugin generates into public/ during every build.
+public/sw.js
+public/swe-worker-*.js
+public/workbox-*.js
+public/fallback-*.js

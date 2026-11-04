@@ -1,5 +1,8 @@
-'use server';
-
+/*
+ * This is a Server Component, not a Server Action, so there's no 'use server' directive here.
+ * Since Next.js 14.2 it would turn every export into an async action, and
+ * mapPojectsToSelectItems() would return a Promise instead of an array.
+ */
 import 'server-only';
 import { ProjectDto, getProjects } from '@/features/app/projects/data-access/ProjectsDataAccess';
 import { Select, SelectItemProps, SelectProps } from '@/features/shared/ui/control/select/Select';

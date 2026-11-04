@@ -1,0 +1,18 @@
+# Used by the "https" profile of docker-compose.yml. APP_DOMAIN comes from .env: a domain name,
+# or just the IP address of your server.
+{
+	# A browser never sends an IP address as the TLS server name, and behind Docker's NAT Caddy
+	# can't tell which IP was dialed. Without this, https://<ip> fails with a TLS internal error.
+	default_sni {$APP_DOMAIN}
+}
+
+{$APP_DOMAIN} {
+	encode zstd gzip
+
+	# Caddy's own certificate authority. It works anywhere, including on a private WireGuard
+	# address, but every device has to trust Caddy's root certificate once.
+	# For a certificate that browsers trust out of the box, see "HTTPS" in docs/SELF_HOSTING.md.
+	tls internal
+
+	reverse_proxy app:3000
+}
