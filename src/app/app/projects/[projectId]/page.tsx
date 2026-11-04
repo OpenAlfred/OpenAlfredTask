@@ -14,14 +14,25 @@ export default function ProjectPage({ params: { projectId } }: ProjectPageProps)
       <ProjectPageHeader id={projectId} />
       <NoTasksInProject id={projectId} />
       <TaskList byProject={projectId} only="incomplete" />
-      <AddTask containerClassName="my-8" projectId={projectId}>
+      <AddTask containerClassName="mt-1" projectId={projectId}>
         <TaskForm
-          className="rounded-md bg-gray-100 px-2 py-6 sm:px-6 mt-4"
+          className="mt-3 rounded-xl border border-border bg-card p-3 shadow-sm"
           projectId={projectId}
           startOnEditingMode
         />
       </AddTask>
-      <TaskList byProject={projectId} only="completed" />
+      <TaskList byProject={projectId} only="completed">
+        {({ list, tasks }) =>
+          tasks.length > 0 && (
+            <>
+              <h2 className="mt-10 flex items-baseline gap-2 pb-1 text-sm font-semibold text-muted-foreground">
+                Completed <span className="text-xs font-medium">{tasks.length}</span>
+              </h2>
+              {list}
+            </>
+          )
+        }
+      </TaskList>
     </>
   );
 }

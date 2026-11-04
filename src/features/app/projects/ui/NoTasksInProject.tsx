@@ -13,5 +13,5 @@ export const NoTasksInProject = async ({ id }: NoTasksInProjectProps) => {
   if (errors) return <ErrorList errors={errors} />;
   if (!tasks || tasks.length > 0) return null;
 
-  return <p className="mb-6 text-sm font-medium text-gray-600">No tasks in this project.</p>;
+  return <p className="py-3 text-sm text-muted-foreground">No tasks in this project yet.</p>;
 };

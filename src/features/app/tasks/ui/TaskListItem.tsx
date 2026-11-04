@@ -3,10 +3,11 @@ import { sanitize } from 'isomorphic-dompurify';
 import { utcToZonedTime } from 'date-fns-tz';
 import { CalendarEventIcon } from '@/features/shared/ui/icon/CalendarEventIcon';
 import { ClassNamePropsOptional } from '@/features/shared/ui/ClassNameProps';
+import { getProjectColorClassName } from '@/features/app/projects/ui/projectColorClassName';
 import { TaskCheck } from './TaskCheck';
 import { TaskCheckSize } from './TaskCheckSize';
 import { twJoin, twMerge } from 'tailwind-merge';
-import { formatTaskDueDate } from './formatTaskDueDate';
+import { formatTaskDueDate, getTaskDueDateClassName } from './formatTaskDueDate';
 
 export interface TaskListItemProps extends ClassNamePropsOptional {
   readonly completedAt: Date | null | undefined;
@@ -14,6 +15,7 @@ export interface TaskListItemProps extends ClassNamePropsOptional {
   readonly dueDate: Date | null | undefined;
   readonly id: string;
   readonly name: string;
+  readonly project?: { readonly id: string; readonly name: string };
   readonly timeZone: string;
 }
 
@@ -24,45 +26,60 @@ export const TaskListItem = ({
   dueDate,
   id,
   name,
+  project,
   timeZone,
 }: TaskListItemProps) => {
+  const zonedDueDate = dueDate && utcToZonedTime(dueDate, timeZone);
+  const zonedNow = utcToZonedTime(new Date(), timeZone);
+
   return (
-    <div
-      className={twMerge(
-        'flex grow py-4 border-y border-transparent hover:border-gray-100',
-        className,
-      )}
-    >
+    <div className={twMerge('flex min-w-0 grow items-start gap-3 py-3', className)}>
       <TaskCheck
-        className="mt-0.25"
+        className="mt-[3px]"
         completedAt={completedAt}
         size={TaskCheckSize.Medium}
         taskId={id}
       />
-      <Link href={`/app/tasks/${id}`} className="flex grow text-left cursor">
-        <div className="ml-3 block">
+      <Link href={`/app/tasks/${id}`} className="flex min-w-0 grow flex-col rounded-md text-left">
+        <div
+          className={twJoin(
+            'text-sm leading-6',
+            completedAt ? 'text-muted-foreground line-through' : 'text-foreground',
+          )}
+          dangerouslySetInnerHTML={{ __html: sanitize(name) }}
+        />
+        {description && (
           <div
-            className={twJoin('text-sm text-gray-800', completedAt && 'line-through')}
-            dangerouslySetInnerHTML={{ __html: sanitize(name) }}
+            className="max-h-5 truncate text-xs leading-5 text-muted-foreground"
+            dangerouslySetInnerHTML={{ __html: sanitize(description) }}
           />
-          {description && (
-            <div
-              className="mt-2 block w-[20rem] overflow-hidden text-ellipsis whitespace-nowrap text-xs text-gray-400 md:w-[26rem] lg:w-[40rem]"
-              dangerouslySetInnerHTML={{ __html: sanitize(description) }}
-            />
-          )}
-          {dueDate && (
-            <div className="flex mt-2">
-              <CalendarEventIcon className="fill-gray-400" width="0.875rem" height="0.875rem" />
-              <p className="text-xs text-gray-400 ml-1">
-                {formatTaskDueDate(
-                  utcToZonedTime(dueDate, timeZone),
-                  utcToZonedTime(new Date(), timeZone),
+        )}
+        {(zonedDueDate || project) && (
+          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+            {zonedDueDate && (
+              <span
+                className={twJoin(
+                  'flex items-center gap-1',
+                  completedAt
+                    ? 'text-muted-foreground'
+                    : getTaskDueDateClassName(zonedDueDate, zonedNow),
                 )}
-              </p>
-            </div>
-          )}
-        </div>
+              >
+                <CalendarEventIcon aria-hidden="true" width="0.875rem" height="0.875rem" />
+                {formatTaskDueDate(zonedDueDate, zonedNow)}
+              </span>
+            )}
+            {project && (
+              <span className="flex items-center gap-1.5 text-muted-foreground">
+                <span
+                  aria-hidden="true"
+                  className={twJoin('h-2 w-2 rounded-full', getProjectColorClassName(project.id))}
+                />
+                {project.name}
+              </span>
+            )}
+          </div>
+        )}
       </Link>
     </div>
   );

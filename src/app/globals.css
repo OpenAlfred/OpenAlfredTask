@@ -2,27 +2,65 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   /*
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-rgb: 0, 0, 0;
+   * Color tokens as RGB channels, used by the colors in tailwind.config.js.
+   * The app follows the system color scheme. Wrap a page in .theme-light to keep it light.
+   */
+  :root,
+  .theme-light {
+    color-scheme: light;
+    --background: 255 255 255;
+    --foreground: 24 24 27;
+    --muted: 244 244 245;
+    --muted-foreground: 113 113 122;
+    --sidebar: 250 250 250;
+    --card: 255 255 255;
+    --border: 228 228 231;
+    --input: 212 212 216;
+    --primary: 4 132 89;
+    --primary-foreground: 255 255 255;
+    --destructive: 220 38 38;
   }
-  */
-}
 
-body {
-  background-color: rgb(var(--background-rgb));
-  color: rgb(var(--foreground-rgb));
-}
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --background: 9 9 11;
+      --foreground: 244 244 245;
+      --muted: 39 39 42;
+      --muted-foreground: 161 161 170;
+      --sidebar: 17 17 19;
+      --card: 24 24 27;
+      --border: 39 39 42;
+      --input: 63 63 70;
+      --primary: 16 185 129;
+      --primary-foreground: 2 44 34;
+      --destructive: 248 113 113;
+    }
+  }
 
-button:focus, a:focus {
-  outline: 2px solid transparent;
+  *,
+  ::before,
+  ::after {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  ::selection {
+    @apply bg-primary/20;
+  }
+
+  /*
+   * Keyboard users get a visible focus ring, mouse and touch users don't.
+   */
+  :where(a, button, summary, [role='button']):focus-visible {
+    outline: 2px solid rgb(var(--primary));
+    outline-offset: 2px;
+  }
 }
 
 @layer components {
@@ -49,7 +87,7 @@ button:focus, a:focus {
     animation-duration: 250ms;
     animation-timing-function: linear;
   }
-  
+
   @keyframes dialog-content-hide-sm {
     from {
       transform: translate3d(0, 10%, 0);
@@ -58,18 +96,18 @@ button:focus, a:focus {
       transform: translate3d(0, 100%, 0);
     }
   }
-  
+
   @keyframes dialog-content-show-md {
     from {
       opacity: 0;
-      transform: scale(0.95);
+      transform: scale(0.96) translateY(0.5rem);
     }
     to {
       opacity: 1;
-      transform: scale(1);
+      transform: scale(1) translateY(0);
     }
   }
-  
+
   @keyframes dialog-content-hide-md {
     from {
       opacity: 1;
@@ -77,7 +115,7 @@ button:focus, a:focus {
     }
     to {
       opacity: 0;
-      transform: scale(0.95);
+      transform: scale(0.96);
     }
   }
 
@@ -97,7 +135,7 @@ button:focus, a:focus {
   .spinner {
     width: 1rem;
     height: 1rem;
-    border: 0.125rem solid #fff;
+    border: 0.125rem solid currentColor;
     border-bottom-color: transparent;
     border-radius: 50%;
     display: flex;
@@ -112,12 +150,12 @@ button:focus, a:focus {
     100% {
         transform: rotate(360deg);
     }
-  } 
+  }
   /**/
 
   /*
    * Simple reusable animations
-  */  
+  */
   @keyframes fade-in {
     from {
       opacity: 0;
@@ -126,7 +164,7 @@ button:focus, a:focus {
       opacity: 1;
     }
   }
-  
+
   @keyframes fade-out {
     from {
       opacity: 1;
@@ -139,3 +177,15 @@ button:focus, a:focus {
 
 }
 
+/*
+ * react-day-picker, themed with our tokens. "div.rdp" wins over the library's own ".rdp" rules.
+ */
+div.rdp {
+  --rdp-accent-color: rgb(var(--primary));
+  --rdp-background-color: rgb(var(--primary) / 0.12);
+  --rdp-accent-color-dark: rgb(var(--primary));
+  --rdp-background-color-dark: rgb(var(--primary) / 0.2);
+  --rdp-outline: 2px solid rgb(var(--primary));
+  --rdp-outline-selected: 2px solid rgb(var(--primary));
+  margin: 0;
+}

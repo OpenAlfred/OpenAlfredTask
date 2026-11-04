@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { PageHeader } from '@/features/app/shared/ui/PageHeader';
 import { ProjectForm } from '@/features/app/projects/ui/ProjectForm';
 import { ProjectFormSkeleton } from '@/features/app/projects/ui/ProjectFormSkeleton';
 
@@ -8,10 +9,10 @@ interface EditProjectPageProps {
 
 export default function EditProjectPage({ params: { projectId } }: EditProjectPageProps) {
   return (
-    <div className="flex flex-col mt-10">
-      <h1 className="text-xl text-gray-800">Edit project</h1>
-      <Suspense fallback={<ProjectFormSkeleton className="mt-6" ssrOnly="Loading project..." />}>
-        <ProjectForm className="mt-6" projectId={projectId} />
+    <div className="flex flex-col">
+      <PageHeader title="Edit project" />
+      <Suspense fallback={<ProjectFormSkeleton className="mt-2" ssrOnly="Loading project..." />}>
+        <ProjectForm className="mt-2 max-w-xl" projectId={projectId} />
       </Suspense>
     </div>
   );

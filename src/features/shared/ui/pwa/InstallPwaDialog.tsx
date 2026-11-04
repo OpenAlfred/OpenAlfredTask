@@ -57,7 +57,7 @@ export const InstallPwaDialog = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen} title="Add to Home Screen">
       <div className="flex flex-col">
-        <p className="font-medium text-gray-800 mt-6">
+        <p className="font-medium text-foreground mt-6">
           Add OpenTask to your home screen to have a better user experience and use it in
           fullscreen.
         </p>
@@ -65,13 +65,13 @@ export const InstallPwaDialog = () => {
           <>
             <div className="flex items-center mt-6">
               <IOSShareIcon fill="#2998ff" />
-              <p className="text-sm font-medium text-gray-800 ml-4 mt-2">
+              <p className="text-sm font-medium text-foreground ml-4 mt-2">
                 1&#41; Tap the &quot;Share&quot; button
               </p>
             </div>
             <div className="flex items-center mt-4">
               <IOSAddIcon />
-              <p className="text-sm font-medium text-gray-800 ml-4">
+              <p className="text-sm font-medium text-foreground ml-4">
                 2&#41; Tap &quot;Add to Home Screen&quot; button
               </p>
             </div>

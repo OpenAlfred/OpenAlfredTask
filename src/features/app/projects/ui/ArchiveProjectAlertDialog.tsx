@@ -35,7 +35,7 @@ export const ArchiveProjectAlertDialog = ({
             message={
               <span>
                 Are you sure you want to {action.toLowerCase()}{' '}
-                <span className="font-semibold">{projectName}</span>?
+                <span className="font-medium text-foreground">{projectName}</span>?
               </span>
             }
             onConfirm="submit"

@@ -3,6 +3,7 @@ export const CheckIcon = (props: React.SVGProps<SVGSVGElement>) => (
     xmlns="http://www.w3.org/2000/svg"
     height="1.125rem"
     viewBox="0 -960 960 960"
+    fill="currentColor"
     width="1.125rem"
     {...props}
   >

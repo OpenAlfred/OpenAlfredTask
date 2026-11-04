@@ -4,10 +4,14 @@ import { Inter } from 'next/font/google';
 import { InstallPwaProvider } from '@/features/shared/ui/pwa/InstallPwaProvider';
 
 export const viewport: Viewport = {
-  colorScheme: 'only light',
+  colorScheme: 'light dark',
   initialScale: 1,
   maximumScale: 1,
-  themeColor: '#FFFFFF',
+  // Keep these in sync with --background in globals.css.
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#FFFFFF' },
+    { media: '(prefers-color-scheme: dark)', color: '#09090B' },
+  ],
   width: 'device-width',
 };
 

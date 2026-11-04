@@ -37,25 +37,33 @@ export const ProjectForm = async ({ className, projectId }: ProjectFormProps) =>
   return (
     <Form action={formAction} className={twMerge('flex flex-col', className)}>
       {project && <input type="hidden" name="id" value={project.id} />}
+      <label htmlFor="project-name" className="text-sm font-medium">
+        Name
+      </label>
       <input
         autoFocus
         defaultValue={name}
+        id="project-name"
         name="name"
         type="text"
         placeholder="Project name"
-        className={twMerge(inputTextClassName, 'mb-6')}
+        className={twMerge(inputTextClassName, 'mb-5 mt-1.5')}
         required
         minLength={1}
         maxLength={500}
         autoComplete="off"
       />
+      <label htmlFor="project-description" className="text-sm font-medium">
+        Description <span className="font-normal text-muted-foreground">(optional)</span>
+      </label>
       <textarea
         defaultValue={description}
+        id="project-description"
         name="description"
-        placeholder="Project description"
-        rows={5}
+        placeholder="What is this project about?"
+        rows={4}
         maxLength={500}
-        className={twMerge(inputTextClassName, 'mb-6 resize-none')}
+        className={twMerge(inputTextClassName, 'mb-6 mt-1.5 resize-none')}
       ></textarea>
       <FormErrorList />
       <SubmitButton className={twMerge(buttonGreenClassName, 'flex self-end')}>Save</SubmitButton>

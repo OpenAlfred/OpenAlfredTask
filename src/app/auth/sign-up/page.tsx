@@ -20,62 +20,63 @@ export default async function SignUpPage() {
   /**/
 
   return (
-    <div className="pb-20">
-      <h2 className="mb-9 mt-8 text-center text-xl font-semibold text-gray-900">Create account</h2>
-      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        {isSignUpEnabled() ? (
-          <Form action={signUpWithEmail}>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-900">
-              Name <span className="font-normal text-gray-600">(optional)</span>
-            </label>
-            <input
-              id="name"
-              name="name"
-              type="text"
-              autoComplete="name"
-              maxLength={500}
-              className={`${inputTextClassName} mb-6 mt-2`}
-            />
-            <label htmlFor="email" className="block text-sm font-medium text-gray-900">
-              Email
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              className={`${inputTextClassName} mb-6 mt-2`}
-              required
-            />
-            <label htmlFor="password" className="block text-sm font-medium text-gray-900">
-              Password
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="new-password"
-              minLength={8}
-              maxLength={128}
-              className={`${inputTextClassName} mt-2`}
-              required
-            />
-            <p className="mb-6 mt-2 text-xs text-gray-600">At least 8 characters.</p>
-            <FormErrorList />
-            <SubmitButton className={`${buttonGreenClassName} flex w-full justify-center`}>
-              Create account
-            </SubmitButton>
-          </Form>
-        ) : (
-          <p className="text-center text-sm text-gray-600">Sign-ups are disabled on this server.</p>
-        )}
-        <p className="mt-6 text-sm text-gray-600">
-          Already have an account?{' '}
-          <Link href="/auth/sign-in" className="underline hover:text-green-500">
-            Sign in
-          </Link>
+    <div className="flex flex-col">
+      <h1 className="text-xl font-semibold tracking-tight">Create account</h1>
+      <p className="mt-1 text-sm text-muted-foreground">Start organizing your tasks.</p>
+      {isSignUpEnabled() ? (
+        <Form action={signUpWithEmail} className="mt-6">
+          <label htmlFor="name" className="block text-sm font-medium">
+            Name <span className="font-normal text-muted-foreground">(optional)</span>
+          </label>
+          <input
+            id="name"
+            name="name"
+            type="text"
+            autoComplete="name"
+            maxLength={500}
+            className={`${inputTextClassName} mb-4 mt-1.5`}
+          />
+          <label htmlFor="email" className="block text-sm font-medium">
+            Email
+          </label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            autoComplete="email"
+            className={`${inputTextClassName} mb-4 mt-1.5`}
+            required
+          />
+          <label htmlFor="password" className="block text-sm font-medium">
+            Password
+          </label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            autoComplete="new-password"
+            minLength={8}
+            maxLength={128}
+            className={`${inputTextClassName} mt-1.5`}
+            required
+          />
+          <p className="mb-6 mt-1.5 text-xs text-muted-foreground">At least 8 characters.</p>
+          <FormErrorList />
+          <SubmitButton className={`${buttonGreenClassName} flex w-full justify-center`}>
+            Create account
+          </SubmitButton>
+        </Form>
+      ) : (
+        <p className="mt-6 rounded-lg bg-muted px-3 py-2 text-sm text-muted-foreground">
+          Sign-ups are disabled on this server.
         </p>
-      </div>
+      )}
+      <p className="mt-6 text-center text-sm text-muted-foreground">
+        Already have an account?{' '}
+        <Link href="/auth/sign-in" className="font-medium text-primary hover:underline">
+          Sign in
+        </Link>
+      </p>
     </div>
   );
 }

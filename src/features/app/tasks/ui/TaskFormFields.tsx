@@ -133,85 +133,85 @@ export const TaskFormFields = ({
     setIsOnEditingMode(true);
   };
 
-  const inputNameAndDescriptionClassName = twJoin(
-    'mb-3 block w-full rounded-md bg-white px-3 py-1.5 ring-0 focus:border-gray-900 focus:outline-0 focus:ring-0',
-    isOnEditingMode && 'border border-gray-400 bg-white',
-  );
+  const inputNameAndDescriptionClassName =
+    'block w-full rounded-lg px-2 py-1 outline-none transition-colors hover:bg-muted/60 focus:bg-muted/60';
 
   const inputNameBaseClassName = twMerge(
     inputNameAndDescriptionClassName,
+    'text-[0.9375rem] font-medium',
     _task && _task.completedAt && 'line-through',
     taskNameClassName,
   );
 
-  const inputNameClassName = `${inputNameBaseClassName} text-gray-900`;
+  const inputNameClassName = `${inputNameBaseClassName} text-foreground`;
 
-  const inputNamePlaceholderClassName = `${inputNameBaseClassName} text-gray-400`;
+  const inputNamePlaceholderClassName = `${inputNameBaseClassName} text-muted-foreground`;
 
-  const inputDescriptionClassName = `${inputNameAndDescriptionClassName} text-gray-900`;
+  const inputDescriptionClassName = `${inputNameAndDescriptionClassName} text-sm text-foreground`;
 
-  const inputDescriptionPlaceholderClassName = `${inputNameAndDescriptionClassName} text-gray-400`;
+  const inputDescriptionPlaceholderClassName = `${inputNameAndDescriptionClassName} text-sm text-muted-foreground`;
 
   return (
     <div className="flex flex-col" key={keyToRerenderFields}>
       {canUseRevalidateTag && <input type="hidden" name="revalidateTagValue" value="tasks" />}
-      <div className="flex">
+      <div className="flex gap-2">
         {_task && (
           <TaskCheck
-            className="mt-2"
+            className="mt-1.5"
             completedAt={_task && _task.completedAt}
             onClick={onTaskCheckClick}
             size={TaskCheckSize.Large}
             taskId={_task.id}
           />
         )}
-        <div className={twMerge('flex flex-col grow', className)}>
-          <div className={`${_task ? 'mx-2' : ''}`}>
-            <InputContentEditable
-              autoFocus={startOnEditingMode}
-              className={inputNameClassName}
-              defaultValue={_task?.name}
-              name="name"
-              onFocus={onNameDescriptionFocus}
-              placeholder="Task name"
-              placeholderClassName={inputNamePlaceholderClassName}
-              submitOnEnter
-            />
-            <InputContentEditable
-              className={inputDescriptionClassName}
-              defaultValue={_task?.description}
-              name="description"
-              onFocus={onNameDescriptionFocus}
-              placeholder="Task description"
-              placeholderClassName={inputDescriptionPlaceholderClassName}
-            />
-          </div>
-          {isOnEditingMode && (
-            <div className="mt-6 flex justify-end gap-2 sm:gap-4">
-              <button
-                type="button"
-                className={buttonWhiteClassName}
-                onClick={() => {
-                  resetForm();
-                  router.replace(pathname);
-                }}
-              >
-                Cancel
-              </button>
-              <SubmitButton className={buttonGreenClassName}>Save</SubmitButton>
-            </div>
-          )}
+        <div className={twMerge('flex min-w-0 flex-col grow gap-1', className)}>
+          <InputContentEditable
+            autoFocus={startOnEditingMode}
+            className={inputNameClassName}
+            defaultValue={_task?.name}
+            name="name"
+            onFocus={onNameDescriptionFocus}
+            placeholder="Task name"
+            placeholderClassName={inputNamePlaceholderClassName}
+            submitOnEnter
+          />
+          <InputContentEditable
+            className={inputDescriptionClassName}
+            defaultValue={_task?.description}
+            name="description"
+            onFocus={onNameDescriptionFocus}
+            placeholder="Description"
+            placeholderClassName={inputDescriptionPlaceholderClassName}
+          />
         </div>
       </div>
-      <div className="mt-12 flex flex-col sm:flex-row">
+      {/* The padding lines the chips up with the text of the inputs above. */}
+      <div className={twJoin('mt-4 flex flex-wrap items-center gap-2', _task ? 'pl-10' : 'pl-2')}>
         <TaskDueDatePicker
           defaultDate={_task?.dueDate ?? _defaultDueDate}
           name="dueDate"
           onChange={onDueDateChange}
           taskId={_task?.id}
         />
-        <div className="relative h-12 sm:ml-4 md:ml-16 mt-6 sm:mt-0">{projectsSelect}</div>
+        {projectsSelect}
       </div>
+      {isOnEditingMode && (
+        <div className="mt-4 flex justify-end gap-2 border-t border-border pt-4">
+          <button
+            type="button"
+            className={buttonWhiteClassName}
+            onClick={() => {
+              resetForm();
+              router.replace(pathname);
+            }}
+          >
+            Cancel
+          </button>
+          <SubmitButton className={buttonGreenClassName}>
+            {_task ? 'Save' : 'Add task'}
+          </SubmitButton>
+        </div>
+      )}
     </div>
   );
 };

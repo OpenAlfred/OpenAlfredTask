@@ -14,21 +14,21 @@ export const Logo = ({
   displayText = false,
   width = '2rem',
 }: LogoProps) => (
-  <div className="flex flex-row">
+  <div className="flex flex-row items-center">
     <LogoIcon
-      className={color === 'green' ? 'fill-green-700' : 'fill-gray-50'}
+      className={color === 'green' ? 'fill-primary' : 'fill-white'}
       height={height}
       width={width}
     />
     {displayText && (
-      <h1
+      <span
         className={twJoin(
-          'ml-2 text-lg font-semibold leading-8',
-          color === 'green' ? 'text-green-700' : 'text-gray-50',
+          'ml-2 text-lg font-semibold tracking-tight',
+          color === 'green' ? 'text-foreground' : 'text-white',
         )}
       >
         OpenTask
-      </h1>
+      </span>
     )}
   </div>
 );

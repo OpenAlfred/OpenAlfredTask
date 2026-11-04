@@ -15,7 +15,7 @@ export default function TaskDialogPage({ params: { taskId } }: TaskDialogPagePro
     <DeleteTaskAlertDialog
       id={taskId}
       routerActionOnSubmitSuccess={RouterActions.BackAndRefresh}
-      trigger={<DeleteIconButton className="mr-2" />}
+      trigger={<DeleteIconButton />}
     />
   );
 
@@ -38,7 +38,7 @@ export default function TaskDialogPage({ params: { taskId } }: TaskDialogPagePro
       routerActionOnClose={RouterActions.BackAndRefresh}
     >
       <Suspense fallback={<TaskFormSkeletonSkeleton className="mt-6" ssrOnly="Loading task..." />}>
-        <TaskForm taskId={taskId} taskNameClassName="text-2xl" />
+        <TaskForm taskId={taskId} taskNameClassName="text-xl font-semibold" />
       </Suspense>
     </Dialog>
   );

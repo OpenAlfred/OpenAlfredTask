@@ -3,6 +3,7 @@
 import 'client-only';
 import { useRouter } from 'next/navigation';
 import { Switch } from '@/features/shared/ui/control/switch/Switch';
+import { PageHeader } from '@/features/app/shared/ui/PageHeader';
 
 interface ProjectsPageHeaderProps {
   readonly archived?: boolean;
@@ -17,14 +18,14 @@ export const ProjectsPageHeader = ({ archived = false }: ProjectsPageHeaderProps
   };
 
   return (
-    <div className="flex flex-col">
-      <div className="sticky top-0 flex w-full justify-between bg-white py-8">
-        <h1 className="text-lg font-semibold text-gray-800">Projects</h1>
-        <div className="flex">
-          <p className="mr-4 text-gray-800">Archived</p>
+    <PageHeader
+      title="Projects"
+      actions={
+        <>
+          <p className="text-sm text-muted-foreground">Show archived</p>
           <Switch enabled={archived} onClick={onSwitchClick} />
-        </div>
-      </div>
-    </div>
+        </>
+      }
+    />
   );
 };

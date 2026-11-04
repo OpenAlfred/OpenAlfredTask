@@ -4,6 +4,8 @@ import { useState } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { twJoin, twMerge } from 'tailwind-merge';
 import { ChildrenProps } from '@/features/shared/ui/ChildrenProps';
+import { ClassNamePropsOptional } from '@/features/shared/ui/ClassNameProps';
+import { buttonIconClassName } from '@/features/shared/ui/control/button/buttonClassName';
 import { XIcon } from '@/features/shared/ui/icon/XIcon';
 import { RouterAction } from '@/features/shared/routing/RouterActions';
 import { useRouterAction } from '@/features/shared/routing/useRouterAction';
@@ -28,13 +30,13 @@ export const invisibleOverlayClassNames = `group/overlay fixed inset-0 w-full h-
 
 export const visibleOverlayAnimation =
   'group-data-[state=open]/overlay:animate-[fade-in_200ms_ease-out] group-data-[state=closed]/overlay:animate-[fade-out_200ms_ease-out]';
-export const visibleOverlayClassNames = `fixed inset-0 bg-black/50 ${visibleOverlayAnimation}`;
+export const visibleOverlayClassNames = `fixed inset-0 bg-black/40 backdrop-blur-[2px] dark:bg-black/60 ${visibleOverlayAnimation}`;
 
 export const dialogContentAnimationSm = `data-[state=open]:animation-dialog-content-show-sm data-[state=closed]:animation-dialog-content-hide-sm`;
-export const dialogContentAnimationMd = `md:data-[state=open]:animate-[dialog-content-show-md_300ms_ease-out] md:data-[state=closed]:animate-[dialog-content-hide-md_200ms_ease-in]`;
-export const dialogContentClassNames = `flex flex-col mx-auto w-full rounded-lg bg-white p-4 md:w-[40rem] translate-y-[10%] md:translate-y-0 ${dialogContentAnimationSm} ${dialogContentAnimationMd}`;
+export const dialogContentAnimationMd = `md:data-[state=open]:animate-[dialog-content-show-md_250ms_ease-out] md:data-[state=closed]:animate-[dialog-content-hide-md_150ms_ease-in]`;
+export const dialogContentClassNames = `flex flex-col mx-auto w-full rounded-t-2xl md:rounded-2xl bg-card p-5 sm:p-6 shadow-2xl ring-1 ring-black/5 dark:ring-white/10 focus:outline-none md:w-[38rem] translate-y-[10%] md:translate-y-0 ${dialogContentAnimationSm} ${dialogContentAnimationMd}`;
 
-interface DialogProps extends ChildrenProps {
+interface DialogProps extends ChildrenProps, ClassNamePropsOptional {
   readonly defaultOpen?: boolean;
   readonly headerButtons?: React.ReactNode;
   readonly noCloseButton?: boolean;
@@ -48,6 +50,7 @@ interface DialogProps extends ChildrenProps {
 
 export const Dialog = ({
   children,
+  className,
   defaultOpen,
   headerButtons,
   noCloseButton,
@@ -87,7 +90,7 @@ export const Dialog = ({
           <div className={visibleOverlayClassNames} aria-hidden="true" />
           <div className="flex fixed inset-0 md:items-center">
             <DialogPrimitive.Content
-              className={dialogContentClassNames}
+              className={twMerge(dialogContentClassNames, className)}
               onOpenAutoFocus={onOpenAutoFocus}
             >
               <div
@@ -97,15 +100,18 @@ export const Dialog = ({
                 )}
               >
                 {title ? (
-                  <DialogPrimitive.Title className="text-xl">{title}</DialogPrimitive.Title>
+                  <DialogPrimitive.Title className="text-lg font-semibold tracking-tight">
+                    {title}
+                  </DialogPrimitive.Title>
                 ) : (
                   children
                 )}
-                <div className="flex flex-row gap-x-3">
+                <div className="-mr-1.5 flex flex-row gap-x-1">
                   {headerButtons}
                   {!noCloseButton && (
-                    <DialogPrimitive.Close className="-m-2.5 rounded-md p-1.5 text-gray-700 hover:bg-gray-200">
-                      <XIcon aria-hidden="true" />
+                    <DialogPrimitive.Close className={buttonIconClassName}>
+                      <span className="sr-only">Close</span>
+                      <XIcon aria-hidden="true" width="1.25rem" height="1.25rem" />
                     </DialogPrimitive.Close>
                   )}
                 </div>

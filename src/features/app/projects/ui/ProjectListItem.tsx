@@ -2,9 +2,10 @@
 
 import 'client-only';
 import Link from 'next/link';
-import { twMerge } from 'tailwind-merge';
+import { twJoin, twMerge } from 'tailwind-merge';
 import { ClassNamePropsOptional } from '@/features/shared/ui/ClassNameProps';
 import { useIsPathActive } from '@/features/shared/routing/useIsPathActive';
+import { getProjectColorClassName } from './projectColorClassName';
 
 interface ProjectListItemProps extends ClassNamePropsOptional {
   readonly activeClassName?: string;
@@ -27,12 +28,15 @@ export const ProjectListItem = ({
     <Link
       href={_href}
       className={twMerge(
-        'flex grow items-center rounded-none lg:rounded-md py-2.5 text-base lg:text-sm text-gray-600 hover:bg-gray-200 border-b lg:border-b-0',
+        'flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[0.9375rem] text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground md:py-1.5 md:text-sm',
         className,
         isActive && activeClassName,
       )}
     >
-      {name}
+      <span aria-hidden="true" className="flex h-5 w-5 shrink-0 items-center justify-center">
+        <span className={twJoin('h-2 w-2 rounded-full', getProjectColorClassName(id))} />
+      </span>
+      <span className="truncate">{name}</span>
     </Link>
   );
 };

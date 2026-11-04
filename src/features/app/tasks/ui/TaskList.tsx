@@ -4,6 +4,7 @@ import 'server-only';
 import { twMerge } from 'tailwind-merge';
 import { ClassNamePropsOptional } from '@/features/shared/ui/ClassNameProps';
 import { getServerSideUser } from '@/features/app/users/data-access/UsersDataAccess';
+import { ProjectDto } from '@/features/app/projects/data-access/ProjectsDataAccess';
 import { GetTasksParams, TaskDto, getTasks } from '../data-access/TasksDataAccess';
 import { TaskListItem } from './TaskListItem';
 import { ErrorList } from '@/features/shared/ui/error/ErrorList';
@@ -16,6 +17,10 @@ export interface TaskListProps extends GetTasksParams, ClassNamePropsOptional {
     readonly list: React.ReactNode;
     readonly tasks: Array<TaskDto>;
   }) => React.ReactNode;
+  /*
+   * Pass the projects to show the project of each task, for lists that mix several projects.
+   */
+  readonly projects?: Array<ProjectDto>;
 }
 
 /*
@@ -25,7 +30,7 @@ export interface TaskListProps extends GetTasksParams, ClassNamePropsOptional {
  * "Type is referenced directly or indirectly in the fulfillment callback of its own 'then' method.ts(1062)"
  */
 // @ts-ignore
-export const TaskList = async ({ children, className, ...rest }: TaskListProps) => {
+export const TaskList = async ({ children, className, projects, ...rest }: TaskListProps) => {
   const [{ timeZone }, { data: tasks, errors }] = await Promise.all([
     getServerSideUser(),
     getTasks(rest),
@@ -39,7 +44,7 @@ export const TaskList = async ({ children, className, ...rest }: TaskListProps) 
     list = (
       <div className={twMerge('flex flex-col', className)}>
         {tasks.map((task) => (
-          <div key={task.id} className="flex mb-4 last:mb-0">
+          <div key={task.id} className="flex border-b border-border">
             <TaskListItem
               completedAt={task.completedAt}
               description={task.description || ''}
@@ -47,6 +52,7 @@ export const TaskList = async ({ children, className, ...rest }: TaskListProps) 
               id={task.id}
               key={task.id}
               name={task.name}
+              project={projects?.find((project) => project.id === task.projectId)}
               timeZone={timeZone}
             />
           </div>

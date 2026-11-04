@@ -19,7 +19,7 @@ export const MainMenuLink = ({ activeClassName, children, className, href }: Mai
     <Link
       href={href}
       className={twMerge(
-        'flex rounded-md p-2 text-base lg:text-sm font-medium text-gray-600 hover:bg-gray-200 gap-2',
+        'flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[0.9375rem] font-medium text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground md:py-1.5 md:text-sm',
         className,
         isActive && activeClassName,
       )}

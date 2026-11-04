@@ -1,8 +1,9 @@
 'use client';
 
 import 'client-only';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { twJoin, twMerge } from 'tailwind-merge';
+import { twMerge } from 'tailwind-merge';
 import { ClassNamePropsOptional } from '@/features/shared/ui/ClassNameProps';
 import { CheckIcon } from '@/features/shared/ui/icon/CheckIcon';
 import { ServerResponse } from '@/features/shared/data-access/ServerResponse';
@@ -31,14 +32,29 @@ export interface TaskCheckProps extends ClassNamePropsOptional {
 export const TaskCheck = ({ className, completedAt, onClick, size, taskId }: TaskCheckProps) => {
   const router = useRouter();
 
+  /*
+   * Shows the new state right away instead of after the server round trip.
+   * It's dropped as soon as the task comes back from the server.
+   */
+  const [optimisticIsCompleted, setOptimisticIsCompleted] = useState<boolean>();
+  const isCompleted = optimisticIsCompleted ?? Boolean(completedAt);
+
+  useEffect(() => {
+    setOptimisticIsCompleted(undefined);
+  }, [completedAt]);
+  /**/
+
   const onCheckClick = async () => {
     if (!taskId) return;
+
+    setOptimisticIsCompleted(!completedAt);
 
     const formData = new FormData();
     formData.append('id', taskId);
     formData.append('completedAt', completedAt ? 'null' : new Date().toString());
 
     const response = await updateTask(undefined, formData);
+    if (response.errors) setOptimisticIsCompleted(undefined);
 
     /*
      * Flavio Silva on Nov. 22:
@@ -64,22 +80,28 @@ export const TaskCheck = ({ className, completedAt, onClick, size, taskId }: Tas
   };
 
   return (
-    <button type="button" className="group cursor flex self-start text-left" onClick={onCheckClick}>
-      <div
+    <button
+      type="button"
+      aria-label={isCompleted ? 'Mark as not completed' : 'Mark as completed'}
+      className="group flex shrink-0 self-start rounded-full"
+      onClick={onCheckClick}
+    >
+      <span
         className={twMerge(
-          'shrink-0 rounded-full border border-gray-400 relative',
-          size === TaskCheckSize.Medium ? 'h-5 w-5' : 'h-7 w-7',
+          'flex items-center justify-center rounded-full border-[1.5px] transition-all duration-150 active:scale-90',
+          size === TaskCheckSize.Medium ? 'h-[1.125rem] w-[1.125rem]' : 'h-6 w-6',
+          isCompleted
+            ? 'border-primary bg-primary text-primary-foreground'
+            : 'border-muted-foreground/60 text-transparent group-hover:border-primary group-hover:bg-primary/10 group-hover:text-primary',
           className,
         )}
       >
         <CheckIcon
-          className={twJoin(
-            'absolute fill-gray-500',
-            size === TaskCheckSize.Medium ? 'w-5 h-5' : 'w-7 h-7',
-            !completedAt && 'hidden group-hover:block',
-          )}
+          aria-hidden="true"
+          width={size === TaskCheckSize.Medium ? '0.875rem' : '1.125rem'}
+          height={size === TaskCheckSize.Medium ? '0.875rem' : '1.125rem'}
         />
-      </div>
+      </span>
     </button>
   );
 };

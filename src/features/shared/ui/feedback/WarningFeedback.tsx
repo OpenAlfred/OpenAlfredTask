@@ -8,13 +8,11 @@ interface WarningFeedbackProps extends ChildrenProps, ClassNamePropsOptional {}
 export const WarningFeedback = ({ children, className }: WarningFeedbackProps) => (
   <div
     className={twMerge(
-      'flex flex-col bg-orange-50 p-6 rounded-2xl border border-[rgb(229, 231, 235)]',
+      'flex items-start gap-3 rounded-xl border border-amber-500/25 bg-amber-50 p-4 text-sm text-amber-900 dark:bg-amber-500/10 dark:text-amber-200',
       className,
     )}
   >
-    <h3>
-      <WarningIcon className="fill-orange-700" />
-    </h3>
-    <div className="flex mt-6 text-sm whitespace-pre-line">{children}</div>
+    <WarningIcon className="shrink-0 text-amber-600 dark:text-amber-400" aria-hidden="true" />
+    <div className="flex whitespace-pre-line">{children}</div>
   </div>
 );

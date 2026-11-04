@@ -4,20 +4,16 @@ import { buttonGreenClassName } from '@/features/shared/ui/control/button/button
 
 export default function NotFound() {
   return (
-    <div className="flex flex-1 flex-col mt-8">
-      <div className="flex flex-col items-center">
-        <Link href="/" className="-m-1.5 p-1.5">
-          <span className="sr-only">Open Task</span>
-          <Logo displayText />
-        </Link>
-        <div className="flex flex-col items-center mt-8">
-          <h2 className="text-3xl">404</h2>
-          <p className="mt-4">This page could not be found.</p>
-          <Link href="/" className={`${buttonGreenClassName} mt-8`}>
-            Return Home
-          </Link>
-        </div>
-      </div>
+    <div className="flex flex-1 flex-col items-center px-4 py-16 text-center">
+      <Link href="/" className="-m-1.5 rounded-lg p-1.5">
+        <Logo displayText />
+      </Link>
+      <p className="mt-16 text-sm font-semibold text-primary">404</p>
+      <h1 className="mt-2 text-2xl font-bold tracking-tight">Page not found</h1>
+      <p className="mt-2 text-sm text-muted-foreground">This page could not be found.</p>
+      <Link href="/" className={`${buttonGreenClassName} mt-8`}>
+        Return Home
+      </Link>
     </div>
   );
 }

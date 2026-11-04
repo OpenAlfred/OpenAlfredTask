@@ -9,7 +9,11 @@ interface NewTaskDialogPageProps {
 export default function NewTaskDialogPage({ searchParams: { projectId } }: NewTaskDialogPageProps) {
   return (
     <Dialog defaultOpen routerActionOnClose={RouterActions.BackAndRefresh}>
-      <TaskForm projectId={projectId} startOnEditingMode taskNameClassName="text-2xl" />
+      <TaskForm
+        projectId={projectId}
+        startOnEditingMode
+        taskNameClassName="text-xl font-semibold"
+      />
     </Dialog>
   );
 }

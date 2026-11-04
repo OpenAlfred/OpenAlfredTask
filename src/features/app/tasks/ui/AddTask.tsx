@@ -83,13 +83,15 @@ export const AddTask = ({
       >
         <button
           onClick={onAddTask}
-          className={twMerge(buttonLinkClassName, 'group py-4  flex-row self-start', className)}
+          className={twMerge(
+            buttonLinkClassName,
+            'group gap-3 py-3 flex-row self-start',
+            className,
+          )}
         >
-          <PlusSignalIcon
-            width="1.25rem"
-            height="1.25rem"
-            className="fill-gray-600 mr-1 group-hover:fill-green-600"
-          />
+          <span className="flex h-[1.125rem] w-[1.125rem] items-center justify-center rounded-full text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+            <PlusSignalIcon aria-hidden="true" width="1rem" height="1rem" />
+          </span>
           Add task
         </button>
       </Transition>

@@ -24,10 +24,11 @@ export const DeleteProjectAlertDialog = ({
           <input type="hidden" name="id" value={projectId} />
           <AlertDialogBody
             confirmButtonLabel="Delete"
+            destructive
             message={
               <span>
-                Are you sure you want to delete <span className="font-semibold">{projectName}</span>
-                ?
+                Are you sure you want to delete{' '}
+                <span className="font-medium text-foreground">{projectName}</span>?
               </span>
             }
             onConfirm="submit"

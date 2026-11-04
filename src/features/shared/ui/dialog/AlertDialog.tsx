@@ -5,6 +5,7 @@ import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog';
 import { twMerge } from 'tailwind-merge';
 import {
   buttonGreenClassName,
+  buttonRedClassName,
   buttonWhiteClassName,
 } from '@/features/shared/ui/control/button/buttonClassName';
 import { SubmitButton } from '@/features/shared/ui/control/button/SubmitButton';
@@ -20,6 +21,7 @@ export interface AlertDialogBodyProps {
   readonly cancelButtonLabel?: string;
   readonly confirmButtonLabel: string;
   readonly confirmButtonLabelSubmitting?: React.ReactNode;
+  readonly destructive?: boolean;
   readonly message: string | React.ReactNode;
   readonly onConfirm: (() => void) | 'submit';
 }
@@ -28,19 +30,22 @@ export const AlertDialogBody = ({
   cancelButtonLabel = 'Cancel',
   confirmButtonLabel,
   confirmButtonLabelSubmitting,
+  destructive = false,
   message,
   onConfirm,
 }: AlertDialogBodyProps) => {
+  const confirmButtonClassName = destructive ? buttonRedClassName : buttonGreenClassName;
+
   const submitButton =
     onConfirm === 'submit' ? (
       <AlertDialogPrimitive.Action asChild>
-        <SubmitButton className={buttonGreenClassName} submitting={confirmButtonLabelSubmitting}>
+        <SubmitButton className={confirmButtonClassName} submitting={confirmButtonLabelSubmitting}>
           {confirmButtonLabel}
         </SubmitButton>
       </AlertDialogPrimitive.Action>
     ) : (
       <AlertDialogPrimitive.Action asChild>
-        <button type="button" className={buttonGreenClassName} onClick={onConfirm}>
+        <button type="button" className={confirmButtonClassName} onClick={onConfirm}>
           {confirmButtonLabel}
         </button>
       </AlertDialogPrimitive.Action>
@@ -48,10 +53,10 @@ export const AlertDialogBody = ({
 
   return (
     <div className="flex flex-col">
-      <AlertDialogPrimitive.Description className="mt-6">
+      <AlertDialogPrimitive.Description className="mt-2 text-sm text-muted-foreground">
         {message}
       </AlertDialogPrimitive.Description>
-      <div className="mt-12 flex justify-end gap-4">
+      <div className="mt-6 flex justify-end gap-3">
         <AlertDialogPrimitive.Cancel className={buttonWhiteClassName}>
           {cancelButtonLabel}
         </AlertDialogPrimitive.Cancel>
@@ -108,8 +113,12 @@ export const AlertDialog = ({
         <AlertDialogPrimitive.Overlay className={twMerge(invisibleOverlayClassNames, 'z-50')}>
           <div className={visibleOverlayClassNames} aria-hidden="true" />
           <div className="flex fixed inset-0 md:items-center z-50">
-            <AlertDialogPrimitive.Content className={dialogContentClassNames}>
-              <AlertDialogPrimitive.Title className="text-xl">{title}</AlertDialogPrimitive.Title>
+            <AlertDialogPrimitive.Content
+              className={twMerge(dialogContentClassNames, 'md:w-[28rem]')}
+            >
+              <AlertDialogPrimitive.Title className="text-lg font-semibold tracking-tight">
+                {title}
+              </AlertDialogPrimitive.Title>
               {body}
             </AlertDialogPrimitive.Content>
           </div>

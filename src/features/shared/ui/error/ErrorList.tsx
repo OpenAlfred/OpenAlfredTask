@@ -15,9 +15,15 @@ export const ErrorList = ({ className, errors }: ErrorListProps) => {
   if (pending || !errors || errors.length < 1) return null;
 
   return (
-    <div className={twMerge('flex flex-col', className)}>
+    <div
+      role="alert"
+      className={twMerge(
+        'mb-4 flex flex-col gap-1 rounded-lg border border-destructive/20 bg-destructive/10 px-3 py-2',
+        className,
+      )}
+    >
       {errors.map((error) => (
-        <p key={error.message} className="text-sm mb-2 text-red-600">
+        <p key={error.message} className="text-sm text-destructive">
           {error.message}
         </p>
       ))}

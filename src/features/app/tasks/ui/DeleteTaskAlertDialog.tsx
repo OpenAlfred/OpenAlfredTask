@@ -34,9 +34,11 @@ export const DeleteTaskAlertDialog = async ({
           <input type="hidden" name="id" value={id} />
           <AlertDialogBody
             confirmButtonLabel="Delete"
+            destructive
             message={
               <span>
-                Are you sure you want to delete <span className="font-semibold">{task.name}</span>?
+                Are you sure you want to delete{' '}
+                <span className="font-medium text-foreground">{task.name}</span>?
               </span>
             }
             onConfirm="submit"

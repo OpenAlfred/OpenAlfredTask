@@ -2,10 +2,13 @@
 
 import 'server-only';
 import { notFound } from 'next/navigation';
+import { twJoin } from 'tailwind-merge';
 import { ErrorList } from '@/features/shared/ui/error/ErrorList';
 import { WarningFeedback } from '@/features/shared/ui/feedback/WarningFeedback';
+import { PageHeader } from '@/features/app/shared/ui/PageHeader';
 import { getProjectById } from '../data-access/ProjectsDataAccess';
 import { ProjectMutationDropdown } from './ProjectMutationDropdown';
+import { getProjectColorClassName } from './projectColorClassName';
 
 export interface ProjectPageHeaderProps {
   readonly id: string;
@@ -19,15 +22,28 @@ export const ProjectPageHeader = async ({ id }: ProjectPageHeaderProps) => {
 
   return (
     <div className="flex flex-col">
-      <div className="sticky top-0 flex w-full justify-between bg-white py-8">
-        <h1 className="text-lg font-semibold text-gray-800">{project.name}</h1>
-        <ProjectMutationDropdown project={project} />
-      </div>
+      <PageHeader
+        title={
+          <span className="flex items-center gap-3">
+            <span
+              aria-hidden="true"
+              className={twJoin(
+                'h-3 w-3 shrink-0 rounded-full',
+                getProjectColorClassName(project.id),
+              )}
+            />
+            <span className="truncate">{project.name}</span>
+          </span>
+        }
+        actions={<ProjectMutationDropdown project={project} />}
+      />
       {project.description && (
-        <p className="block whitespace-pre-line text-sm mb-8">{project.description}</p>
+        <p className="mb-4 block whitespace-pre-line text-sm text-muted-foreground">
+          {project.description}
+        </p>
       )}
       {project.archivedAt && (
-        <WarningFeedback className="mb-8">
+        <WarningFeedback className="mb-6">
           <p className="block">This project is archived.</p>
         </WarningFeedback>
       )}

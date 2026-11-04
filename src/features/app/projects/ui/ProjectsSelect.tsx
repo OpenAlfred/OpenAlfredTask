@@ -4,16 +4,26 @@
  * mapPojectsToSelectItems() would return a Promise instead of an array.
  */
 import 'server-only';
+import { twJoin } from 'tailwind-merge';
 import { ProjectDto, getProjects } from '@/features/app/projects/data-access/ProjectsDataAccess';
 import { Select, SelectItemProps, SelectProps } from '@/features/shared/ui/control/select/Select';
 import { ErrorList } from '@/features/shared/ui/error/ErrorList';
+import { getProjectColorClassName } from './projectColorClassName';
 
 export type ProjectsSelectProps = Omit<SelectProps, 'items'>;
 
 export const mapPojectsToSelectItems = (projects: Array<ProjectDto>): Array<SelectItemProps> =>
   projects.map((project) => ({
     value: project.id,
-    children: project.name,
+    children: (
+      <span className="flex items-center gap-2">
+        <span
+          aria-hidden="true"
+          className={twJoin('h-2 w-2 shrink-0 rounded-full', getProjectColorClassName(project.id))}
+        />
+        {project.name}
+      </span>
+    ),
   }));
 
 export const ProjectsSelect = async ({ defaultValue, onValueChange }: ProjectsSelectProps) => {

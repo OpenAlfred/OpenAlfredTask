@@ -20,46 +20,45 @@ export default async function SignInPage() {
   /**/
 
   return (
-    <div className="pb-20">
-      <h2 className="mb-9 mt-8 text-center text-xl font-semibold text-gray-900">Sign in</h2>
-      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <Form action={signInWithEmail}>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-900">
-            Email
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            className={`${inputTextClassName} mb-6 mt-2`}
-            required
-          />
-          <label htmlFor="password" className="block text-sm font-medium text-gray-900">
-            Password
-          </label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            autoComplete="current-password"
-            className={`${inputTextClassName} mb-6 mt-2`}
-            required
-          />
-          <FormErrorList />
-          <SubmitButton className={`${buttonGreenClassName} flex w-full justify-center`}>
-            Sign in
-          </SubmitButton>
-        </Form>
-        {isSignUpEnabled() && (
-          <p className="mt-6 text-sm text-gray-600">
-            No account yet?{' '}
-            <Link href="/auth/sign-up" className="underline hover:text-green-500">
-              Create one
-            </Link>
-          </p>
-        )}
-      </div>
+    <div className="flex flex-col">
+      <h1 className="text-xl font-semibold tracking-tight">Welcome back</h1>
+      <p className="mt-1 text-sm text-muted-foreground">Sign in to your OpenTask account.</p>
+      <Form action={signInWithEmail} className="mt-6">
+        <label htmlFor="email" className="block text-sm font-medium">
+          Email
+        </label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          autoComplete="email"
+          className={`${inputTextClassName} mb-4 mt-1.5`}
+          required
+        />
+        <label htmlFor="password" className="block text-sm font-medium">
+          Password
+        </label>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          autoComplete="current-password"
+          className={`${inputTextClassName} mb-6 mt-1.5`}
+          required
+        />
+        <FormErrorList />
+        <SubmitButton className={`${buttonGreenClassName} flex w-full justify-center`}>
+          Sign in
+        </SubmitButton>
+      </Form>
+      {isSignUpEnabled() && (
+        <p className="mt-6 text-center text-sm text-muted-foreground">
+          No account yet?{' '}
+          <Link href="/auth/sign-up" className="font-medium text-primary hover:underline">
+            Create one
+          </Link>
+        </p>
+      )}
     </div>
   );
 }

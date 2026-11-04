@@ -2,6 +2,7 @@
 
 import { twMerge } from 'tailwind-merge';
 import { DeleteIcon } from '../../icon/DeleteIcon';
+import { buttonIconClassName } from './buttonClassName';
 import { forwardRef } from 'react';
 
 export interface DeleteIconButtonProps
@@ -14,7 +15,11 @@ export const DeleteIconButton = forwardRef<HTMLButtonElement, DeleteIconButtonPr
   ({ className, ...rest }, ref) => (
     <button
       type="button"
-      className={twMerge('rounded-md p-1.5 text-gray-700 hover:bg-gray-200', className)}
+      className={twMerge(
+        buttonIconClassName,
+        '[&:not(:disabled)]:hover:bg-destructive/10 [&:not(:disabled)]:hover:text-destructive',
+        className,
+      )}
       {...rest}
       ref={ref}
     >

@@ -4,8 +4,11 @@ import 'client-only';
 import { Fragment, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Menu } from '@headlessui/react';
-import { twJoin } from 'tailwind-merge';
-import { DropdownMenu } from '@/features/shared/ui/control/dropdown/DropdownMenu';
+import { buttonIconClassName } from '@/features/shared/ui/control/button/buttonClassName';
+import {
+  DropdownMenu,
+  getDropdownMenuItemClassName,
+} from '@/features/shared/ui/control/dropdown/DropdownMenu';
 import { MoreHorizontalIcon } from '@/features/shared/ui/icon/MoreHorizontalIcon';
 import { ArchiveIcon } from '@/features/shared/ui/icon/ArchiveIcon';
 import { DeleteIcon } from '@/features/shared/ui/icon/DeleteIcon';
@@ -32,22 +35,22 @@ const menuItems: Array<ProjectMutationDropdownItem> = [
   {
     action: ProjectMutationAction.Edit,
     label: 'Edit project',
-    icon: <EditIcon className="mr-3 group-hover:fill-white" />,
+    icon: <EditIcon className="text-muted-foreground" />,
   },
   {
     action: ProjectMutationAction.Archive,
     label: 'Archive project',
-    icon: <ArchiveIcon className="mr-3 group-hover:fill-white" />,
+    icon: <ArchiveIcon className="text-muted-foreground" />,
   },
   {
     action: ProjectMutationAction.Unarchive,
     label: 'Unarchive project',
-    icon: <UnarchiveIcon className="mr-3 group-hover:fill-white" />,
+    icon: <UnarchiveIcon className="text-muted-foreground" />,
   },
   {
     action: ProjectMutationAction.Delete,
     label: 'Delete project',
-    icon: <DeleteIcon className="mr-3 group-hover:fill-white" />,
+    icon: <DeleteIcon />,
   },
 ];
 
@@ -149,15 +152,13 @@ export const ProjectMutationDropdown = ({ project }: ProjectMutationDropdownProp
             <button
               type="button"
               onClick={() => onProjectActionClick(item.action)}
-              className={twJoin(
-                'group flex w-full items-center rounded-md px-2 py-3 text-sm',
-                active ? 'group bg-green-500 text-white' : 'text-gray-900',
+              className={getDropdownMenuItemClassName(
+                active,
+                item.action === ProjectMutationAction.Delete,
               )}
             >
-              <div className="flex items-center">
-                {item.icon}
-                {item.label}
-              </div>
+              {item.icon}
+              {item.label}
             </button>
           )}
         </Menu.Item>
@@ -167,10 +168,11 @@ export const ProjectMutationDropdown = ({ project }: ProjectMutationDropdownProp
     <>
       <div className="relative [&>div]:flex">
         <DropdownMenu
-          itemsClassName="absolute top-10 right-0 max-h-48 w-56"
+          itemsClassName="absolute top-10 right-0 z-20 w-52 origin-top-right"
           menuButton={
-            <Menu.Button className="flex items-center justify-center">
-              <MoreHorizontalIcon className=" hover:fill-green-500" />
+            <Menu.Button className={buttonIconClassName}>
+              <span className="sr-only">Project actions</span>
+              <MoreHorizontalIcon aria-hidden="true" width="1.5rem" height="1.5rem" />
             </Menu.Button>
           }
         >

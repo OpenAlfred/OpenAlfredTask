@@ -17,18 +17,18 @@ export const SelectItem = forwardRef<HTMLDivElement, SelectPrimitive.SelectItemP
     return (
       <SelectPrimitive.Item
         className={twMerge(
-          'relative px-8 py-1 my-1 rounded-md select-none',
-          'data-[disabled]:text-gray-400 data-[disabled]:pointer-events-none',
-          'data-[highlighted]:outline-none data-[highlighted]:bg-green-500 data-[highlighted]:text-white data-[state=checked]:bg-green-500 data-[state=checked]:text-white',
+          'relative flex cursor-default select-none items-center rounded-md py-2 pl-8 pr-3 text-sm text-foreground outline-none',
+          'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+          'data-[highlighted]:bg-muted data-[state=checked]:font-medium',
           className,
         )}
         {...props}
         ref={forwardedRef}
       >
-        <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
-        <SelectPrimitive.ItemIndicator className="SelectItemIndicator">
-          <CheckIcon className="absolute left-1.5 top-2 inline-flex fill-white" />
+        <SelectPrimitive.ItemIndicator className="absolute left-2 flex items-center text-primary">
+          <CheckIcon width="1rem" height="1rem" />
         </SelectPrimitive.ItemIndicator>
+        <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
       </SelectPrimitive.Item>
     );
   },
@@ -42,23 +42,27 @@ export interface SelectProps extends SelectPrimitive.SelectProps {
   readonly placeholder: string;
 }
 
-const scrollButtonClassName = 'absolute left-0 inline-flex items-center justify-center w-8';
+const scrollButtonClassName = 'flex h-6 items-center justify-center text-muted-foreground';
 
 export const Select = ({ ariaLabel, items, placeholder, ...props }: SelectProps) => (
   <SelectPrimitive.Root {...props}>
     <SelectPrimitive.Trigger
-      className="inline-flex items-center justify-center rounded-md px-4 h-9 gap-1 bg-green-600 hover:bg-green-500 text-white shadow-sm"
+      className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-border px-2.5 text-sm text-foreground transition-colors hover:bg-muted data-[state=open]:bg-muted"
       aria-label={ariaLabel}
     >
       <SelectPrimitive.Value placeholder={placeholder} />
-      <SelectPrimitive.Icon className="mt-0.5 fill-white">
-        <ExpandMoreIcon />
+      <SelectPrimitive.Icon className="text-muted-foreground">
+        <ExpandMoreIcon width="1.125rem" height="1.125rem" />
       </SelectPrimitive.Icon>
     </SelectPrimitive.Trigger>
     <SelectPrimitive.Portal>
-      <SelectPrimitive.Content className="overflow-hidden bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-[41]">
+      <SelectPrimitive.Content
+        className="z-[41] max-h-[var(--radix-select-content-available-height)] min-w-[var(--radix-select-trigger-width)] overflow-hidden rounded-xl border border-border bg-card shadow-lg shadow-black/5 dark:shadow-black/40"
+        position="popper"
+        sideOffset={6}
+      >
         <SelectPrimitive.ScrollUpButton className={scrollButtonClassName}>
-          <ExpandLessIcon />
+          <ExpandLessIcon width="1.125rem" height="1.125rem" />
         </SelectPrimitive.ScrollUpButton>
         <SelectPrimitive.Viewport className="p-1">
           {items.map((item) => (
@@ -68,7 +72,7 @@ export const Select = ({ ariaLabel, items, placeholder, ...props }: SelectProps)
           ))}
         </SelectPrimitive.Viewport>
         <SelectPrimitive.ScrollDownButton className={scrollButtonClassName}>
-          <ExpandLessIcon />
+          <ExpandMoreIcon width="1.125rem" height="1.125rem" />
         </SelectPrimitive.ScrollDownButton>
       </SelectPrimitive.Content>
     </SelectPrimitive.Portal>

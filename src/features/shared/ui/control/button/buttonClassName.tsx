@@ -5,12 +5,14 @@
  */
 
 export const buttonCommonClassName =
-  'flex items-center justify-center rounded-md text-sm font-medium';
+  'flex items-center justify-center gap-2 rounded-lg text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-70';
 
-export const buttonGreenClassName = `${buttonCommonClassName} shadow-sm px-3.5 py-2.5 bg-green-600 text-white [&:not(:disabled)]:hover:bg-green-500 disabled:cursor-not-allowed`;
+export const buttonGreenClassName = `${buttonCommonClassName} h-9 px-4 shadow-sm bg-primary text-primary-foreground [&:not(:disabled)]:hover:bg-primary/90`;
 
-export const buttonRedClassName = `${buttonCommonClassName} shadow-sm px-3.5 py-2.5 border border-red-600 bg-white text-red-600 [&:not(:disabled)]:hover:bg-gray-50 disabled:cursor-not-allowed`;
+export const buttonRedClassName = `${buttonCommonClassName} h-9 px-4 shadow-sm bg-red-600 text-white [&:not(:disabled)]:hover:bg-red-700`;
 
-export const buttonWhiteClassName = `${buttonCommonClassName} shadow-sm px-3.5 py-2.5 border bg-white text-gray-700 [&:not(:disabled)]:hover:bg-gray-50 disabled:cursor-not-allowed`;
+export const buttonWhiteClassName = `${buttonCommonClassName} h-9 px-4 shadow-sm border border-border bg-card text-foreground [&:not(:disabled)]:hover:bg-muted`;
 
-export const buttonLinkClassName = `${buttonCommonClassName} text-gray-700 px-0 py-0 hover:enabled:bg-transparent [&:not(:disabled)]:hover:text-green-600 [&:not(:disabled)]:hover:fill-green-600 disabled:cursor-not-allowed`;
+export const buttonLinkClassName = `${buttonCommonClassName} text-muted-foreground [&:not(:disabled)]:hover:text-primary`;
+
+export const buttonIconClassName = `${buttonCommonClassName} h-8 w-8 shrink-0 text-muted-foreground [&:not(:disabled)]:hover:bg-muted [&:not(:disabled)]:hover:text-foreground`;

@@ -23,15 +23,15 @@ export const Switch = ({ enabled = false, onClick }: SwitchProps) => {
       checked={_enabled}
       onChange={onSwitchClick}
       className={twJoin(
-        'relative inline-flex h-6 w-11 items-center rounded-full',
-        _enabled ? 'bg-green-700' : 'bg-gray-200',
+        'relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors',
+        _enabled ? 'bg-primary' : 'bg-input',
       )}
     >
       <span className="sr-only">Toggle between active and archived projects</span>
       <span
         className={twJoin(
-          'inline-block h-4 w-4 transform rounded-full bg-white transition',
-          _enabled ? 'translate-x-6' : 'translate-x-1',
+          'inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition',
+          _enabled ? 'translate-x-[1.375rem]' : 'translate-x-0.5',
         )}
       />
     </HeadlessSwitch>
