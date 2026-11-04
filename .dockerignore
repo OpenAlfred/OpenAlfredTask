@@ -5,11 +5,16 @@ node_modules
 .vscode
 .env
 .env.*
-!.env.example
 backups
 docs
+scripts
 README.md
 npm-debug.log*
+
+# Deployment files. The image doesn't need them, and changing one must not rebuild the app.
+Dockerfile
+docker-compose*.yml
+Caddyfile
 
 # Files the PWA plugin generates into public/ during every build.
 public/sw.js

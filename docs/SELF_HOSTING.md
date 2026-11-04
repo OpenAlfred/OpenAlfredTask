@@ -1,20 +1,41 @@
 # OpenTask selbst hosten
 
-Anleitung für einen eigenen Server, der nur über WireGuard erreichbar ist. Alles läuft mit
-`docker compose`: eine PostgreSQL-Datenbank, die App und optional Caddy für HTTPS.
+Anleitung für einen eigenen Server, den nur du erreichst: im Heimnetz oder über ein VPN wie
+WireGuard. Alles läuft mit `docker compose`: eine PostgreSQL-Datenbank, die App und optional Caddy
+für HTTPS.
 
 ## Was du brauchst
 
 - Einen Server mit Docker und dem Compose-Plugin (`docker compose version` muss funktionieren).
-- Ein WireGuard-Interface auf dem Server, zum Beispiel `wg0` mit der IP `10.8.0.1`. Die IP zeigt dir
-  `ip -4 addr show wg0`. Auf den folgenden Seiten steht dafür `10.8.0.1`.
-- Git, um den Code auf den Server zu holen.
+- Die IP, unter der du den Server erreichst, sobald du verbunden bist. Auf den folgenden Seiten steht
+  dafür `10.8.0.1`. Je nach Aufbau ist das:
+  - die IP einer WireGuard-Schnittstelle auf dem Server (`ip -4 addr show wg0`), oder
+  - die Adresse des Servers im Heimnetz, zum Beispiel `192.168.178.99`, wenn dein Router den
+    VPN-Tunnel beendet, wie bei der FRITZ!Box. Gib dem Server dann im Router eine feste IP-Adresse,
+    sonst bricht alles, sobald sie sich ändert.
+- Git, oder `rsync` auf dem Server und auf deinem Laptop, um den Code auf den Server zu bringen.
 
 ## 1. Installieren
+
+Bring den Code auf den Server. Erreicht der Server ein Git-Repository mit dem Code:
 
 ```bash
 git clone <dein-repository> opentask
 cd opentask
+```
+
+Ohne Git-Server schickt `scripts/deploy.sh` den letzten Commit von deinem Laptop aus (mehr dazu bei
+„Updates“). Der erste Aufruf legt den Ordner an und bricht dann ab, weil noch die `.env` fehlt:
+
+```bash
+./scripts/deploy.sh alexander@10.8.0.1 opentask
+ssh alexander@10.8.0.1
+cd opentask
+```
+
+Lege auf dem Server die `.env` an:
+
+```bash
 cp .env.example .env
 ```
 
@@ -39,7 +60,8 @@ docker compose ps
 
 Der erste Build dauert einige Minuten. `migrate` legt die Tabellen an und beendet sich danach, `app`
 startet erst, wenn das geklappt hat. Wenn `docker compose ps` bei `app` den Status `healthy` zeigt,
-läuft alles.
+läuft alles. Hast du den Code mit `scripts/deploy.sh` geschickt, startest du den Stack, indem du das
+Skript ein zweites Mal ausführst.
 
 ## 2. Ersten Account anlegen und Registrierung schließen
 
@@ -54,15 +76,19 @@ läuft alles.
    Ab jetzt zeigt die Registrierungsseite nur noch „Sign-ups are disabled“, und auch der Endpunkt
    `/api/auth/sign-up/email` lehnt neue Accounts ab.
 
-## 3. Nur über WireGuard erreichbar machen
+## 3. Wer den Server erreicht
 
-Die Ports sind schon so gesetzt, dass nichts nach außen offen ist:
+Die Ports sind schon so gesetzt, dass nichts aus dem Internet offen ist:
 
-- Die App lauscht nur auf `APP_BIND`. Mit der WireGuard-IP ist sie nur über das VPN erreichbar.
+- Die App lauscht nur auf `APP_BIND`. Mit der IP einer WireGuard-Schnittstelle erreicht sie nur das
+  VPN. Mit der Heimnetz-Adresse (`192.168.178.99`) erreichen sie alle Geräte im Heimnetz und die
+  VPN-Verbindungen, die der Router dorthin durchlässt. Aus dem Internet erreicht sie nur jemand, wenn
+  du im Router eine Portfreigabe einrichtest.
 - Die Datenbank lauscht nur auf `127.0.0.1`, also nur auf dem Server selbst.
 
 Verlass dich dabei nicht auf eine Firewall wie UFW. Docker setzt veröffentlichte Ports über eigene
 iptables-Regeln, die UFW umgehen. Deshalb ist die Bindung an die IP die eigentliche Absicherung.
+Gebunden wird nur an IPv4-Adressen, die globale IPv6-Adresse des Servers bleibt zu.
 
 Prüfen kannst du es auf dem Server:
 
@@ -70,7 +96,8 @@ Prüfen kannst du es auf dem Server:
 ss -ltn | grep -E ':3000|:5432'
 ```
 
-Die App muss mit der WireGuard-IP erscheinen, die Datenbank mit `127.0.0.1`. Nie `0.0.0.0`.
+Die App (mit HTTPS Caddy) muss mit der gewünschten IP erscheinen, die Datenbank mit `127.0.0.1`.
+Nie `0.0.0.0`.
 
 ## 4. HTTPS
 
@@ -85,13 +112,21 @@ APP_BIND=127.0.0.1
 CADDY_BIND=10.8.0.1
 APP_DOMAIN=10.8.0.1
 BETTER_AUTH_URL=https://10.8.0.1
+COMPOSE_PROFILES=https
 ```
 
-`APP_DOMAIN` kann eine IP oder ein Domainname sein, `BETTER_AUTH_URL` muss genau dazu passen. Dann:
+`APP_DOMAIN` kann eine IP oder ein Domainname sein, `BETTER_AUTH_URL` muss genau dazu passen.
+`COMPOSE_PROFILES=https` sorgt dafür, dass ein einfaches `docker compose up -d --build` Caddy
+mitstartet, sonst brauchst du immer `--profile https`. Dann:
 
 ```bash
-docker compose --profile https up -d --build
+docker compose up -d --build
 ```
+
+Belegt schon etwas anderes die Ports 80 und 443, zum Beispiel Pi-hole, setz in `.env` andere Ports für
+Caddy, etwa `CADDY_HTTPS_PORT=3000` und `CADDY_HTTP_PORT=3080`. Die Adresse im Browser und
+`BETTER_AUTH_URL` bekommen dann den Port, also `https://10.8.0.1:3000`. Caddys Weiterleitung von HTTP
+auf HTTPS führt bei solchen Ports ins Leere, rufe die HTTPS-Adresse direkt auf.
 
 ### Variante A: Caddys eigene Zertifizierungsstelle (läuft sofort)
 
@@ -102,7 +137,13 @@ Root-Zertifikat kennt. Das holst du dir einmal vom Server:
 docker compose cp caddy:/data/caddy/pki/authorities/local/root.crt ./caddy-root.crt
 ```
 
-Installiere `caddy-root.crt` auf deinen Geräten als vertrauenswürdige Zertifizierungsstelle.
+Prüfe den Fingerabdruck, bevor du etwas installierst:
+
+```bash
+openssl x509 -in caddy-root.crt -noout -fingerprint -sha256
+```
+
+Installiere `caddy-root.crt` danach auf deinen Geräten als vertrauenswürdige Zertifizierungsstelle.
 
 ### Variante B: Zertifikat, dem Browser von sich aus vertrauen
 
@@ -148,13 +189,28 @@ zum Beispiel `https://10.8.0.1,https://tasks.example.com`.
 
 ## 5. Updates
 
+Mit Git auf dem Server:
+
 ```bash
 git pull
 docker compose up -d --build
 ```
 
+Ohne Git-Server von deinem Laptop aus:
+
+```bash
+./scripts/deploy.sh alexander@10.8.0.1 opentask
+```
+
+Das Skript schickt den letzten Commit. Änderungen, die du noch nicht committet hast, bleiben draußen.
+Was im Repository nicht mehr existiert, löscht es auf dem Server, nur `.env`,
+`docker-compose.override.yml` und `backups/` lässt es in Ruhe. Danach startet es
+`docker compose up -d --build`. Mit `DRY_RUN=1` davor listet es nur auf, was sich ändern würde.
+
 Neue Migrationen laufen dabei automatisch. Mach vorher ein Backup, wenn sich das Datenbankschema
-geändert hat.
+geändert hat. Ein Build belastet den Server einige Minuten lang. Läuft darauf etwas Empfindliches, zum
+Beispiel ein Spieleserver, wähle eine ruhige Zeit. Ändert sich nur die Doku oder ein Skript, baut
+Docker nichts neu.
 
 ## 6. Backups
 
@@ -289,4 +345,27 @@ endgültig. Für erledigte Tasks ist `complete_task` die bessere Wahl.
 | MCP antwortet mit 401 | Der Token ist falsch, widerrufen oder abgelaufen. Lege in den Einstellungen einen neuen an. |
 | MCP antwortet mit 403 | Die Anfrage hat einen `Origin`-Header, der nicht zu `BETTER_AUTH_URL` oder `BETTER_AUTH_TRUSTED_ORIGINS` passt. MCP-Clients senden keinen, Browser immer. |
 | Claude Code meldet bei HTTPS einen Zertifikatsfehler | Bei Variante A: `NODE_EXTRA_CA_CERTS` auf Caddys Root-Zertifikat setzen (Abschnitt 7). |
+| Der Build bricht mit „Temporary failure resolving“ ab | Die Container erreichen den DNS-Server des Servers nicht. Siehe „Build ohne DNS“ unten. |
+| Caddy startet nicht, „address already in use“ | Ein anderer Dienst belegt den Port. Setz `CADDY_HTTPS_PORT` und `CADDY_HTTP_PORT` auf freie Ports (Abschnitt 4). |
 | App erreichbar, obwohl sie es nicht sein soll | `ss -ltn` zeigt, an welche Adresse ein Port gebunden ist (siehe Abschnitt 3). |
+
+### Build ohne DNS
+
+Bricht der Build bei `apt-get` oder `npm` mit „Temporary failure resolving“ ab, erreichen die
+Container den DNS-Server des Servers nicht. Das passiert, wenn der Router dem Server nur IPv6-DNS-Server
+gibt, denn Docker-Container hängen an einem IPv4-Netz. Lege neben der `docker-compose.yml` eine Datei
+`docker-compose.override.yml` an. Compose liest sie automatisch, sie bleibt nur auf dem Server, und
+`scripts/deploy.sh` lässt sie in Ruhe:
+
+```yaml
+services:
+  migrate:
+    build:
+      network: host
+  app:
+    build:
+      network: host
+```
+
+Der Build läuft dann im Netz des Servers und nutzt dessen Resolver. Die laufenden Container brauchen
+kein DNS.
