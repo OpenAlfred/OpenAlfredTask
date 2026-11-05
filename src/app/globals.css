@@ -5,10 +5,9 @@
 @layer base {
   /*
    * Color tokens as RGB channels, used by the colors in tailwind.config.js.
-   * The app follows the system color scheme. Wrap a page in .theme-light to keep it light.
+   * The app follows the system color scheme.
    */
-  :root,
-  .theme-light {
+  :root {
     color-scheme: light;
     --background: 255 255 255;
     --foreground: 24 24 27;

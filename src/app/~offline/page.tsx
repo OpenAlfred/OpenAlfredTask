@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 
 export const metadata: Metadata = {
-  title: "OpenTask.app: You're offline",
+  title: "OpenAlfred: You're offline",
 };
 
 export default function OfflinePage() {
@@ -12,14 +12,14 @@ export default function OfflinePage() {
         src="/logo-text-512x512.png"
         width={280}
         height={280}
-        alt="OpenTask.app"
+        alt="OpenAlfred"
         className="sm:hidden"
       />
       <Image
         src="/logo-text-512x512.png"
         width={512}
         height={512}
-        alt="OpenTask.app"
+        alt="OpenAlfred"
         className="hidden sm:block"
       />
       <p className="text-lg text-center">

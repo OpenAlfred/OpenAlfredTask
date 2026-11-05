@@ -2,8 +2,8 @@
 # Ships the last commit to a server over SSH and rebuilds the stack there. Use it when the server
 # has no Git repository to pull from.
 #
-#   ./scripts/deploy.sh alexander@192.168.178.99 srv/opentask
-#   DRY_RUN=1 ./scripts/deploy.sh alexander@192.168.178.99 srv/opentask
+#   ./scripts/deploy.sh user@192.168.178.20 srv/opentask
+#   DRY_RUN=1 ./scripts/deploy.sh user@192.168.178.20 srv/opentask
 #
 # The first argument is the SSH target. The second is a folder inside the home folder of the
 # server (default: opentask). It needs a .env, see docs/SELF_HOSTING.md. Files that only exist on

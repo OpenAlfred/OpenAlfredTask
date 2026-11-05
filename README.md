@@ -1,12 +1,12 @@
-# OpenTask
+# OpenAlfred
 
 A small task manager with projects, tasks, due dates and a "Today" view. It is built with Next.js,
 Prisma and PostgreSQL. Sign-in is email and password, handled by
 [Better Auth](https://www.better-auth.com).
 
-This is a self-hosted fork of [flsilva/opentask](https://github.com/flsilva/opentask) (MIT license).
-The original runs on Supabase. This fork only needs PostgreSQL, so the whole thing fits into one
-`docker compose` file.
+OpenAlfred is based on [OpenTask](https://github.com/flsilva/opentask) by Flavio Silva (MIT
+license). The original runs on Supabase. OpenAlfred only needs PostgreSQL, so the whole thing
+fits into one `docker compose` file.
 
 ## Quick start with Docker
 
@@ -54,16 +54,19 @@ Everything is read from `.env` (see `.env.example`):
 | `APP_BIND`, `APP_PORT` | Host address and port of the app. |
 | `CADDY_BIND`, `CADDY_HTTP_PORT`, `CADDY_HTTPS_PORT`, `APP_DOMAIN` | Only for `docker compose --profile https`. |
 
+The Compose project, the database and its user keep the name `opentask` from the original project,
+so existing installs keep their data.
+
 ## MCP server
 
-OpenTask has a [Model Context Protocol](https://modelcontextprotocol.io) server at `/api/mcp`, so an
-AI assistant such as Claude Code can read and change your projects and tasks.
+OpenAlfred has a [Model Context Protocol](https://modelcontextprotocol.io) server at `/api/mcp`,
+so an AI assistant such as Claude Code can read and change your projects and tasks.
 
 1. Sign in, open **Settings** and create an API token under "API tokens". It's shown only once.
 2. Add the server to your client. For Claude Code:
 
    ```bash
-   claude mcp add --transport http opentask https://<your-host>/api/mcp --header "Authorization: Bearer <token>"
+   claude mcp add --transport http openalfred https://<your-host>/api/mcp --header "Authorization: Bearer <token>"
    ```
 
 The tools are `list_projects`, `create_project`, `update_project`, `list_tasks`, `get_task`,
@@ -81,9 +84,9 @@ over a VPN. See [docs/SELF_HOSTING.md](docs/SELF_HOSTING.md) for the details.
 - Prisma talks to a plain PostgreSQL. The `User`, `Session`, `Account` and `Verification` tables belong
   to Better Auth.
 - An MCP server with personal API tokens, see above.
-- No Google Analytics, and the marketing landing page redirects to the app.
-- The `privacy` and `terms` pages still describe the upstream hosted service. Don't rely on them.
+- A redesigned interface with a sidebar and dark mode.
+- No Google Analytics and no marketing pages: `/` opens the app.
 
 ## License
 
-MIT, see [LICENSE](LICENSE). Copyright (c) Flavio Silva.
+MIT, see [LICENSE](LICENSE). Copyright (c) Flavio Silva (OpenTask) and Oko-Tester (OpenAlfred).

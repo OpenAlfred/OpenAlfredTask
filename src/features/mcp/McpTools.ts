@@ -104,7 +104,7 @@ export const getInstructions = ({ timeZone }: VerifiedApiToken) => {
   const zone = timeZone || 'UTC';
 
   return [
-    "OpenTask is the user's personal task manager. Tasks live in projects, and every task belongs to exactly one project.",
+    "OpenAlfred is the user's personal task manager. Tasks live in projects, and every task belongs to exactly one project.",
     `Today is ${formatInTimeZone(new Date(), zone, 'EEEE, yyyy-MM-dd')} (time zone ${zone}). Dates are calendar days written as YYYY-MM-DD.`,
     'Call list_projects first to learn the project ids.',
     'list_tasks returns open tasks of active projects. Pass status "completed" or "all" to include finished ones.',

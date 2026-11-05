@@ -1,3 +1,5 @@
+# Still named after OpenTask, the project this one is based on. The name prefixes the database
+# volume, so renaming it would start existing installs with an empty database.
 name: opentask
 
 # Start it with:   docker compose up -d --build

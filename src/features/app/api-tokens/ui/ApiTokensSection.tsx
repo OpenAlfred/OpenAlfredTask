@@ -130,7 +130,7 @@ export const ApiTokensSection = ({ initialTokens }: ApiTokensSectionProps) => {
           {origin && (
             <CopyField
               label="Add it to Claude Code"
-              value={`claude mcp add --transport http opentask ${origin}/api/mcp --header "Authorization: Bearer ${created.token}"`}
+              value={`claude mcp add --transport http openalfred ${origin}/api/mcp --header "Authorization: Bearer ${created.token}"`}
             />
           )}
           <button

@@ -1,8 +1,12 @@
-# OpenTask selbst hosten
+# OpenAlfred selbst hosten
 
 Anleitung für einen eigenen Server, den nur du erreichst: im Heimnetz oder über ein VPN wie
 WireGuard. Alles läuft mit `docker compose`: eine PostgreSQL-Datenbank, die App und optional Caddy
 für HTTPS.
+
+Technische Namen wie das Compose-Projekt, die Datenbank, der Ordner auf dem Server und die
+Backup-Dateien heißen weiter `opentask`, nach dem Projekt, auf dem OpenAlfred aufbaut. So
+behalten bestehende Installationen ihre Daten.
 
 ## Was du brauchst
 
@@ -10,7 +14,7 @@ für HTTPS.
 - Die IP, unter der du den Server erreichst, sobald du verbunden bist. Auf den folgenden Seiten steht
   dafür `10.8.0.1`. Je nach Aufbau ist das:
   - die IP einer WireGuard-Schnittstelle auf dem Server (`ip -4 addr show wg0`), oder
-  - die Adresse des Servers im Heimnetz, zum Beispiel `192.168.178.99`, wenn dein Router den
+  - die Adresse des Servers im Heimnetz, zum Beispiel `192.168.178.20`, wenn dein Router den
     VPN-Tunnel beendet, wie bei der FRITZ!Box. Gib dem Server dann im Router eine feste IP-Adresse,
     sonst bricht alles, sobald sie sich ändert.
 - Git, oder `rsync` auf dem Server und auf deinem Laptop, um den Code auf den Server zu bringen.
@@ -28,8 +32,8 @@ Ohne Git-Server schickt `scripts/deploy.sh` den letzten Commit von deinem Laptop
 „Updates“). Der erste Aufruf legt den Ordner an und bricht dann ab, weil noch die `.env` fehlt:
 
 ```bash
-./scripts/deploy.sh alexander@10.8.0.1 opentask
-ssh alexander@10.8.0.1
+./scripts/deploy.sh user@10.8.0.1 opentask
+ssh user@10.8.0.1
 cd opentask
 ```
 
@@ -81,7 +85,7 @@ Skript ein zweites Mal ausführst.
 Die Ports sind schon so gesetzt, dass nichts aus dem Internet offen ist:
 
 - Die App lauscht nur auf `APP_BIND`. Mit der IP einer WireGuard-Schnittstelle erreicht sie nur das
-  VPN. Mit der Heimnetz-Adresse (`192.168.178.99`) erreichen sie alle Geräte im Heimnetz und die
+  VPN. Mit der Heimnetz-Adresse (`192.168.178.20`) erreichen sie alle Geräte im Heimnetz und die
   VPN-Verbindungen, die der Router dorthin durchlässt. Aus dem Internet erreicht sie nur jemand, wenn
   du im Router eine Portfreigabe einrichtest.
 - Die Datenbank lauscht nur auf `127.0.0.1`, also nur auf dem Server selbst.
@@ -101,9 +105,9 @@ Nie `0.0.0.0`.
 
 ## 4. HTTPS
 
-Du brauchst HTTPS, wenn du OpenTask auf dem Handy als App installieren willst. Service Worker und die
-Installation als PWA funktionieren nur über HTTPS, im normalen Browser reicht sonst auch HTTP. Dafür
-gibt es das Compose-Profil `https` mit Caddy.
+Du brauchst HTTPS, wenn du OpenAlfred auf dem Handy als App installieren willst. Service Worker
+und die Installation als PWA funktionieren nur über HTTPS, im normalen Browser reicht sonst auch
+HTTP. Dafür gibt es das Compose-Profil `https` mit Caddy.
 
 In `.env`:
 
@@ -199,7 +203,7 @@ docker compose up -d --build
 Ohne Git-Server von deinem Laptop aus:
 
 ```bash
-./scripts/deploy.sh alexander@10.8.0.1 opentask
+./scripts/deploy.sh user@10.8.0.1 opentask
 ```
 
 Das Skript schickt den letzten Commit. Änderungen, die du noch nicht committet hast, bleiben draußen.
@@ -226,7 +230,7 @@ Ein Backup auf demselben Server schützt nicht vor einem Plattenausfall. Hol dir
 zusätzlich auf einen anderen Rechner, zum Beispiel von deinem Laptop aus:
 
 ```bash
-rsync -az alexander@10.8.0.1:opentask/backups/ ~/Backups/opentask/
+rsync -az user@10.8.0.1:opentask/backups/ ~/Backups/opentask/
 ```
 
 Ohne `--delete` bleiben die älteren Kopien auf dem Laptop liegen, auch wenn der Server sie schon
@@ -259,7 +263,7 @@ passt du an.
 
 ```ini
 [Unit]
-Description=OpenTask database backup
+Description=OpenAlfred database backup
 
 [Service]
 Type=oneshot
@@ -271,7 +275,7 @@ ExecStart=/home/<dein-benutzer>/opentask/scripts/backup.sh
 
 ```ini
 [Unit]
-Description=Nightly OpenTask backup
+Description=Nightly OpenAlfred backup
 
 [Timer]
 OnCalendar=*-*-* 03:30:00
@@ -285,23 +289,23 @@ Aktivieren mit `sudo systemctl enable --now opentask-backup.timer`.
 
 ## 7. MCP-Server nutzen
 
-OpenTask hat einen MCP-Server unter `/api/mcp`. Damit kann ein KI-Assistent wie Claude Code deine
-Projekte und Tasks lesen und ändern.
+OpenAlfred hat einen MCP-Server unter `/api/mcp`. Damit kann ein KI-Assistent wie Claude Code
+deine Projekte und Tasks lesen und ändern.
 
 ### Token anlegen
 
-Öffne in OpenTask die **Einstellungen** und lege unter „API tokens“ einen Token an. Gib ihm einen Namen,
-zum Beispiel „Claude Code auf dem Laptop“, und wähle, wann er abläuft (voreingestellt: 1 Jahr). Der
-Token steht nur direkt nach dem Anlegen im Klartext da, in der Datenbank liegt nur sein Hash. Er gibt
-dieselben Rechte wie dein Account. In derselben Liste kannst du ihn jederzeit widerrufen, danach
-schlägt er sofort fehl.
+Öffne in OpenAlfred die **Einstellungen** und lege unter „API tokens“ einen Token an. Gib ihm
+einen Namen, zum Beispiel „Claude Code auf dem Laptop“, und wähle, wann er abläuft (voreingestellt:
+1 Jahr). Der Token steht nur direkt nach dem Anlegen im Klartext da, in der Datenbank liegt nur sein
+Hash. Er gibt dieselben Rechte wie dein Account. In derselben Liste kannst du ihn jederzeit
+widerrufen, danach schlägt er sofort fehl.
 
 ### Claude Code verbinden
 
 Die Einstellungen zeigen den fertigen Befehl direkt nach dem Anlegen. Er sieht so aus:
 
 ```bash
-claude mcp add --transport http opentask https://tasks.example.com/api/mcp --header "Authorization: Bearer <token>"
+claude mcp add --transport http openalfred https://tasks.example.com/api/mcp --header "Authorization: Bearer <token>"
 ```
 
 Ob die Verbindung steht, siehst du in Claude Code mit `/mcp`. Soll der Token nicht in einer Datei
@@ -310,10 +314,10 @@ landen, die du ins Repository eincheckst, nimm in der `.mcp.json` eine Umgebungs
 ```json
 {
   "mcpServers": {
-    "opentask": {
+    "openalfred": {
       "type": "http",
       "url": "https://tasks.example.com/api/mcp",
-      "headers": { "Authorization": "Bearer ${OPENTASK_TOKEN}" }
+      "headers": { "Authorization": "Bearer ${OPENALFRED_TOKEN}" }
     }
   }
 }
@@ -328,7 +332,7 @@ Zwei Dinge sind **nicht getestet**:
 - Bei Variante A (`tls internal`) kennt Claude Code Caddys Zertifizierungsstelle nicht. Starte es dann
   mit `NODE_EXTRA_CA_CERTS=/pfad/zu/caddy-root.crt claude`.
 - Für Clients ohne HTTP-Unterstützung gibt es die stdio-Brücke `mcp-remote`:
-  `npx -y mcp-remote https://tasks.example.com/api/mcp --header "Authorization: Bearer ${OPENTASK_TOKEN}"`.
+  `npx -y mcp-remote https://tasks.example.com/api/mcp --header "Authorization: Bearer ${OPENALFRED_TOKEN}"`.
 
 ### Was der Server kann
 

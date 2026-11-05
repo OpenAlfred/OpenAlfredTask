@@ -58,7 +58,7 @@ export const InstallPwaDialog = () => {
     <Dialog open={isOpen} onOpenChange={setIsOpen} title="Add to Home Screen">
       <div className="flex flex-col">
         <p className="font-medium text-foreground mt-6">
-          Add OpenTask to your home screen to have a better user experience and use it in
+          Add OpenAlfred to your home screen to have a better user experience and use it in
           fullscreen.
         </p>
         {os === 'iOS' && (

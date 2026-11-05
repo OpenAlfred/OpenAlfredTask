@@ -10,7 +10,7 @@ import { getInstructions, registerTools } from '@/features/mcp/McpTools';
 export const dynamic = 'force-dynamic';
 
 /*
- * The MCP server of OpenTask, over Streamable HTTP. It's stateless: every request is
+ * The MCP server of OpenAlfred, over Streamable HTTP. It's stateless: every request is
  * authenticated with an API token and gets its own server instance.
  */
 export async function POST(request: Request) {
@@ -25,7 +25,7 @@ export async function POST(request: Request) {
   if (!user) return unauthorizedResponse();
 
   const handle = createMcpHandler((server) => registerTools(server, user), {
-    serverInfo: { name: 'opentask', version: '0.1.0' },
+    serverInfo: { name: 'openalfred', version: '0.1.0' },
     instructions: getInstructions(user),
   });
 

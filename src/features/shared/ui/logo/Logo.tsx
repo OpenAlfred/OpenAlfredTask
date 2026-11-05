@@ -27,7 +27,7 @@ export const Logo = ({
           color === 'green' ? 'text-foreground' : 'text-white',
         )}
       >
-        OpenTask
+        OpenAlfred
       </span>
     )}
   </div>

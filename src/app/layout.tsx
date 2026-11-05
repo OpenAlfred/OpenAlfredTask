@@ -16,13 +16,10 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: 'OpenTask',
+  title: 'OpenAlfred',
   description: 'Free and Open Source Task Manager.',
-  applicationName: 'OpenTask',
+  applicationName: 'OpenAlfred',
   manifest: '/manifest.json',
-  authors: [{ name: 'Flavio Silva', url: 'https://www.flsilva.com' }],
-  creator: 'Flavio Silva',
-  publisher: 'https://www.flsilva.com',
   formatDetection: { telephone: false },
   generator: 'Next.js',
   keywords: [
@@ -43,7 +40,7 @@ export const metadata: Metadata = {
   },
   appleWebApp: {
     capable: true,
-    title: 'OpenTask',
+    title: 'OpenAlfred',
     statusBarStyle: 'default',
     startupImage: [
       {

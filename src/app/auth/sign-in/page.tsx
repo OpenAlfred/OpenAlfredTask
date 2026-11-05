@@ -22,7 +22,7 @@ export default async function SignInPage() {
   return (
     <div className="flex flex-col">
       <h1 className="text-xl font-semibold tracking-tight">Welcome back</h1>
-      <p className="mt-1 text-sm text-muted-foreground">Sign in to your OpenTask account.</p>
+      <p className="mt-1 text-sm text-muted-foreground">Sign in to your OpenAlfred account.</p>
       <Form action={signInWithEmail} className="mt-6">
         <label htmlFor="email" className="block text-sm font-medium">
           Email

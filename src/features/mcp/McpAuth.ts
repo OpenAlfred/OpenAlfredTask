@@ -50,7 +50,7 @@ export const unauthorizedResponse = () =>
     {
       error: 'unauthorized',
       error_description:
-        'Send a valid API token as "Authorization: Bearer <token>". You can create one in OpenTask under Settings.',
+        'Send a valid API token as "Authorization: Bearer <token>". You can create one in OpenAlfred under Settings.',
     },
-    { 'WWW-Authenticate': 'Bearer realm="OpenTask"' },
+    { 'WWW-Authenticate': 'Bearer realm="OpenAlfred"' },
   );
