@@ -1,3 +1,5 @@
+<img src="public/logo.svg" alt="" width="96" height="96" />
+
 # OpenAlfred
 
 A small task manager with projects, tasks, due dates and a "Today" view. It is built with Next.js,

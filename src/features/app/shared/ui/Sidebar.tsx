@@ -19,7 +19,7 @@ export const Sidebar = async ({ className }: ClassNamePropsOptional) => {
     >
       <div className="flex h-16 shrink-0 items-center px-5">
         <Link href="/app/today" className="-m-1.5 rounded-lg p-1.5">
-          <Logo displayText height="1.5rem" width="1.5rem" />
+          <Logo displayText />
         </Link>
       </div>
       <MainMenu className="flex-1 px-3 pb-4" />

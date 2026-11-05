@@ -14,9 +14,7 @@ export default async function OnboardingPage() {
 
   return (
     <div className="flex flex-col items-center py-20 text-center">
-      <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
-        <LogoIcon className="fill-primary" width="2.25rem" height="2.25rem" />
-      </span>
+      <LogoIcon width="4.5rem" height="4.5rem" />
       <h1 className="mt-6 text-2xl font-bold tracking-tight">Welcome to OpenAlfred!</h1>
       <p className="mt-2 max-w-sm text-sm text-muted-foreground">
         You don&#39;t have any projects yet. Create your first one to start adding tasks.

@@ -24,7 +24,7 @@ export const Header = async ({ className }: ClassNamePropsOptional) => {
           <HamburgerMenuIcon aria-hidden="true" />
         </Link>
         <Link href="/app/today" className="absolute left-1/2 -translate-x-1/2 rounded-lg">
-          <Logo displayText height="1.5rem" width="1.5rem" />
+          <Logo displayText />
         </Link>
         <div className="pr-2">
           <SettingsMenu userEmail={user.email} userName={user.name} />
