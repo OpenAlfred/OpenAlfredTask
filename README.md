@@ -1,6 +1,6 @@
 <img src="public/logo.svg" alt="" width="96" height="96" />
 
-# OpenAlfred
+# OpenAlfredTask
 
 A small task manager with projects, tasks, due dates and a "Today" view. It is built with Next.js,
 Prisma and PostgreSQL. Sign-in is email and password, handled by
